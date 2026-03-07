@@ -89,7 +89,20 @@ body{font-family:'Rajdhani',sans-serif;background:var(--bg);color:var(--text);he
 .ga-btn-ghost{width:100%;background:transparent;border:1px solid var(--border);color:var(--text-mid);padding:12px;border-radius:4px;font-family:'Rajdhani',sans-serif;font-size:14px;cursor:pointer;transition:all .2s;margin-top:8px;}
 .ga-btn-ghost:hover{border-color:var(--text-mid);}
 .ga-err{color:var(--red);font-size:12px;margin-top:-10px;margin-bottom:14px;display:none;letter-spacing:.3px;}
-.ga-hint{text-align:center;font-size:11px;color:var(--text-dim);margin-top:14px;opacity:.7;}
+/* Login tabs */
+.login-tabs{display:flex;border-bottom:1px solid var(--border);margin:-44px -40px 28px;}
+.login-tab{flex:1;padding:15px 10px;text-align:center;font-family:'Orbitron',monospace;font-size:9px;font-weight:700;letter-spacing:2px;color:var(--text-dim);cursor:pointer;border-bottom:2px solid transparent;transition:all .2s;text-transform:uppercase;}
+.login-tab:hover{color:var(--text-mid);}
+.login-tab.active{color:var(--teal);border-bottom-color:var(--teal);}
+.login-tab-icon{font-size:16px;display:block;margin-bottom:4px;}
+.login-pane{display:none;}
+.login-pane.active{display:block;}
+.ga-hint-link{color:var(--teal);cursor:pointer;text-decoration:underline;}
+.ga-hint-link:hover{color:var(--teal-dim);}
+.ga-success-msg{background:rgba(0,212,170,0.08);border:1px solid rgba(0,212,170,0.25);border-radius:4px;padding:10px 14px;font-size:12px;color:var(--teal);margin-bottom:14px;display:none;text-align:center;}
+.ga-input-wrap{position:relative;}
+.ga-input-wrap .ga-input{padding-right:44px;}
+.ga-eye{position:absolute;right:13px;top:50%;transform:translateY(-50%);background:none;border:none;color:var(--text-dim);cursor:pointer;font-size:16px;padding:4px;}
 
 /* Step 2 – Google consent */
 .consent-header{background:#fff;padding:18px 24px;display:flex;align-items:center;gap:14px;border-radius:4px 4px 0 0;margin:-44px -40px 28px;}
@@ -389,31 +402,164 @@ select option{background:var(--bg3);}
 .doc-sel-it:hover{background:var(--bg4);border-color:var(--border);}
 .doc-sel-it.sel{background:var(--teal-bg);border-color:rgba(0,212,170,0.28);}
 .doc-sel-it input[type=checkbox]{accent-color:var(--teal);}
+/* ══ CHAT WHATSAPP STYLE ══ */
+.chat-wrap{display:flex;flex:1;overflow:hidden;}
+
+/* Sidebar de conversaciones */
+.chat-sidebar{width:280px;background:#111b21;border-right:1px solid rgba(255,255,255,.06);display:flex;flex-direction:column;flex-shrink:0;}
+.chat-sidebar-head{padding:14px 16px 12px;background:#202c33;display:flex;align-items:center;justify-content:space-between;flex-shrink:0;}
+.chat-sidebar-head h3{font-size:17px;font-weight:700;color:#e9edef;font-family:'Rajdhani',sans-serif;}
+.chat-room-list{flex:1;overflow-y:auto;}
+.chat-room-item{display:flex;align-items:center;gap:13px;padding:12px 16px;cursor:pointer;transition:background .15s;border-bottom:1px solid rgba(255,255,255,.04);position:relative;}
+.chat-room-item:hover{background:rgba(255,255,255,.05);}
+.chat-room-item.active{background:#2a3942;}
+.chat-room-item .cr-av{width:46px;height:46px;border-radius:50%;background:linear-gradient(135deg,#00a884,#006e57);display:flex;align-items:center;justify-content:center;font-size:20px;flex-shrink:0;overflow:hidden;}
+.chat-room-item .cr-av img{width:100%;height:100%;object-fit:cover;}
+.chat-room-item .cr-info{flex:1;min-width:0;}
+.chat-room-item .cr-name{font-size:15px;font-weight:600;color:#e9edef;}
+.chat-room-item .cr-last{font-size:12px;color:#8696a0;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;margin-top:2px;}
+.chat-room-item .cr-time{font-size:11px;color:#8696a0;position:absolute;top:12px;right:14px;}
+.chat-room-item .cr-badge{position:absolute;bottom:12px;right:14px;background:#00a884;color:#111b21;font-size:11px;font-weight:700;min-width:18px;height:18px;border-radius:9px;display:flex;align-items:center;justify-content:center;padding:0 4px;}
+
+/* Área principal de chat */
+.chat-main{flex:1;display:flex;flex-direction:column;overflow:hidden;background:#0b141a;}
+
+/* Topbar del chat - estilo WhatsApp */
+.chat-topbar{padding:10px 16px;background:#202c33;border-bottom:none;display:flex;align-items:center;gap:12px;flex-shrink:0;}
+.chat-topbar .ct-av{width:40px;height:40px;border-radius:50%;background:linear-gradient(135deg,#00a884,#006e57);display:flex;align-items:center;justify-content:center;font-size:18px;flex-shrink:0;overflow:hidden;}
+.chat-topbar .ct-av img{width:100%;height:100%;object-fit:cover;}
+.chat-topbar .ct-info{flex:1;}
+.chat-topbar .ct-name{font-size:15px;font-weight:700;color:#e9edef;font-family:'Rajdhani',sans-serif;}
+.chat-topbar .ct-status{font-size:12px;color:#8696a0;}
+.ct-online{display:flex;align-items:center;gap:5px;font-size:11px;color:#8696a0;}
+.ct-online .dot-on{width:7px;height:7px;border-radius:50%;background:#25d366;box-shadow:0 0 5px rgba(37,211,102,.6);}
+.ct-online .dot-off{width:7px;height:7px;border-radius:50%;background:#8696a0;}
+
+/* Fondo tipo WhatsApp con patrón */
+.chat-messages{flex:1;overflow-y:auto;padding:12px 16px;display:flex;flex-direction:column;gap:2px;
+  background-color:#0b141a;
+  background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='80' height='80'%3E%3Ccircle cx='40' cy='40' r='35' fill='none' stroke='rgba(255,255,255,0.015)' stroke-width='1'/%3E%3Cpath d='M40 10 L40 70 M10 40 L70 40' stroke='rgba(255,255,255,0.01)' stroke-width='1'/%3E%3C/svg%3E");
+}
+.chat-messages::-webkit-scrollbar{width:6px}
+.chat-messages::-webkit-scrollbar-thumb{background:rgba(255,255,255,.12);border-radius:3px}
+
+/* Separador de fecha */
+.chat-datesep{text-align:center;margin:10px auto;font-size:11px;color:#8696a0;background:#182229;padding:4px 12px;border-radius:8px;display:inline-block;align-self:center;border:1px solid rgba(255,255,255,.06);}
+
+/* Burbujas de mensaje estilo WhatsApp */
+.chat-msg{display:flex;align-items:flex-end;gap:8px;max-width:72%;margin-bottom:2px;}
+.chat-msg.mine{align-self:flex-end;flex-direction:row-reverse;}
+.chat-msg.theirs{align-self:flex-start;}
+.chat-msg.consecutive{margin-bottom:1px;}
+
+.cm-avatar{width:28px;height:28px;border-radius:50%;background:linear-gradient(135deg,#00a884,#006e57);display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:700;color:#fff;flex-shrink:0;overflow:hidden;}
+.cm-avatar img{width:100%;height:100%;object-fit:cover;}
+.chat-msg.mine .cm-avatar{display:none;}
+
+.cm-bub{padding:7px 10px 18px;border-radius:8px;font-size:14px;line-height:1.45;word-break:break-word;position:relative;min-width:80px;max-width:100%;}
+.chat-msg.mine .cm-bub{background:#005c4b;color:#e9edef;border-radius:8px 2px 8px 8px;}
+.chat-msg.theirs .cm-bub{background:#202c33;color:#e9edef;border-radius:2px 8px 8px 8px;}
+
+/* Cola de burbuja */
+.chat-msg.mine .cm-bub::after{content:'';position:absolute;top:0;right:-7px;border:7px solid transparent;border-top-color:#005c4b;border-right:0;}
+.chat-msg.theirs .cm-bub::after{content:'';position:absolute;top:0;left:-7px;border:7px solid transparent;border-top-color:#202c33;border-left:0;}
+
+/* Hora dentro de la burbuja */
+.cm-time{position:absolute;bottom:4px;right:8px;font-size:10px;color:rgba(255,255,255,.45);white-space:nowrap;display:flex;align-items:center;gap:3px;}
+.chat-msg.mine .cm-time{color:rgba(255,255,255,.55);}
+
+/* Ticks de doble check */
+.cm-tick{display:inline-flex;align-items:center;}
+.cm-tick svg{width:14px;height:14px;}
+
+/* Nombre del remitente en grupo */
+.cm-sender{font-size:11px;font-weight:700;color:#00a884;margin-bottom:2px;padding:0 2px;}
+
+/* Barra de input estilo WhatsApp */
+.chat-input-bar{padding:8px 12px;background:#202c33;display:flex;align-items:flex-end;gap:8px;flex-shrink:0;}
+.chat-inp-wrap{flex:1;background:#2a3942;border-radius:22px;display:flex;align-items:flex-end;padding:8px 14px;gap:8px;}
+.chat-inp{flex:1;background:transparent;border:none;color:#e9edef;font-family:'Rajdhani',sans-serif;font-size:15px;outline:none;resize:none;max-height:110px;overflow-y:auto;line-height:1.4;padding:0;}
+.chat-inp::placeholder{color:#8696a0;}
+.chat-send{width:46px;height:46px;border-radius:50%;background:#00a884;border:none;color:#fff;font-size:20px;cursor:pointer;display:flex;align-items:center;justify-content:center;transition:all .2s;flex-shrink:0;box-shadow:0 2px 8px rgba(0,168,132,.3);}
+.chat-send:hover{background:#00967a;transform:scale(1.05);}
+.chat-send:disabled{opacity:.4;cursor:not-allowed;transform:none;}
+
+/* Botón de emoji/adjunto */
+.chat-icon-btn{width:36px;height:36px;border-radius:50%;border:none;background:transparent;color:#8696a0;font-size:20px;cursor:pointer;display:flex;align-items:center;justify-content:center;flex-shrink:0;transition:color .15s;}
+.chat-icon-btn:hover{color:#e9edef;}
+
+.chat-setup{background:#1d2b32;border:1px solid rgba(0,168,132,.25);border-radius:8px;padding:14px 18px;margin:14px;font-size:12px;color:#8696a0;line-height:1.6;}
+.chat-setup b{color:#00a884;}
+.chat-setup input{width:100%;background:#2a3942;border:1px solid rgba(255,255,255,.1);color:#e9edef;padding:9px 12px;border-radius:6px;font-family:'Share Tech Mono',monospace;font-size:12px;outline:none;margin:6px 0 4px;transition:border-color .2s;}
+.chat-setup input:focus{border-color:#00a884;}
+.chat-empty{display:flex;flex:1;flex-direction:column;align-items:center;justify-content:center;gap:10px;color:#8696a0;}
+.chat-empty .ce-ico{font-size:52px;opacity:.4;}
+.chat-empty p{font-size:13px;text-align:center;line-height:1.5;}
+
+/* ══ AVATAR DE USUARIO ══ */
+.u-av-circle{width:46px;height:46px;border-radius:50%;background:linear-gradient(135deg,var(--teal),var(--teal-dim));display:flex;align-items:center;justify-content:center;font-size:18px;font-weight:700;color:#000;overflow:hidden;flex-shrink:0;cursor:pointer;transition:all .2s;position:relative;}
+.u-av-circle:hover::after{content:'📷';position:absolute;inset:0;background:rgba(0,0,0,.5);display:flex;align-items:center;justify-content:center;font-size:18px;}
+.u-av-circle img{width:100%;height:100%;object-fit:cover;}
+.u-av-circle.admin{background:linear-gradient(135deg,var(--gold),#c4841c);}
+
+/* Avatar upload en modal */
+.avatar-upload-wrap{display:flex;flex-direction:column;align-items:center;gap:10px;padding:14px 0 6px;}
+.avatar-preview{width:84px;height:84px;border-radius:50%;background:linear-gradient(135deg,var(--teal),var(--teal-dim));display:flex;align-items:center;justify-content:center;font-size:32px;font-weight:700;color:#000;overflow:hidden;border:3px solid rgba(0,212,170,.3);cursor:pointer;position:relative;transition:all .2s;}
+.avatar-preview:hover{border-color:var(--teal);}
+.avatar-preview:hover::after{content:'Cambiar';position:absolute;inset:0;background:rgba(0,0,0,.55);border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:700;color:#fff;letter-spacing:1px;}
+.avatar-preview img{width:100%;height:100%;object-fit:cover;}
+.avatar-hint{font-size:11px;color:var(--text-dim);text-align:center;}
+
+/* Nav avatar con foto */
+.nav-av-btn{width:34px;height:34px;border-radius:50%;overflow:hidden;}
+.nav-av-btn img{width:100%;height:100%;object-fit:cover;}
+
+/* ══ NOTES ══ */
+.notes-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(220px,1fr));gap:14px;padding:18px;}
+.note-card{background:var(--bg3);border:1px solid var(--border);border-radius:6px;padding:14px 15px;cursor:pointer;transition:all .2s;position:relative;display:flex;flex-direction:column;gap:8px;}
+.note-card:hover{border-color:rgba(0,212,170,.35);box-shadow:0 4px 18px rgba(0,212,170,.07);transform:translateY(-1px);}
+.note-card.unread{border-color:rgba(245,166,35,.45);background:linear-gradient(135deg,var(--bg3),rgba(245,166,35,.04));}
+.note-card.unread::before{content:'NUEVA';position:absolute;top:8px;right:8px;font-size:8px;font-family:'Orbitron',monospace;font-weight:700;letter-spacing:1px;color:var(--gold);background:rgba(245,166,35,.12);border:1px solid rgba(245,166,35,.3);padding:2px 6px;border-radius:3px;}
+.note-meta{display:flex;align-items:center;gap:8px;font-size:10px;color:var(--text-dim);font-family:'Share Tech Mono',monospace;}
+.note-from{font-size:11px;font-weight:700;color:var(--teal);}
+.note-to{font-size:11px;color:var(--text-mid);}
+.note-subject{font-size:13px;font-weight:700;color:var(--text);line-height:1.3;}
+.note-preview{font-size:11px;color:var(--text-dim);line-height:1.5;overflow:hidden;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;}
+.note-acts{display:flex;gap:5px;margin-top:4px;}
+
+/* ══ INBOX POPUP (login) ══ */
+#inbox-popup{position:fixed;inset:0;z-index:3000;display:none;align-items:center;justify-content:center;background:rgba(0,0,0,.7);backdrop-filter:blur(4px);}
+#inbox-popup.open{display:flex;}
+.inbox-card{background:var(--bg3);border:1px solid rgba(245,166,35,.3);border-radius:8px;width:520px;max-width:95vw;max-height:80vh;display:flex;flex-direction:column;box-shadow:0 0 60px rgba(245,166,35,.08),0 24px 60px rgba(0,0,0,.6);}
+.inbox-head{padding:18px 22px 14px;border-bottom:1px solid var(--border);display:flex;align-items:center;gap:12px;}
+.inbox-head .ih-icon{font-size:28px;}
+.inbox-head h2{font-family:'Orbitron',monospace;font-size:13px;font-weight:900;color:var(--gold);letter-spacing:2px;flex:1;}
+.inbox-head .ih-close{background:none;border:none;color:var(--text-dim);font-size:18px;cursor:pointer;padding:4px 8px;border-radius:4px;}
+.inbox-head .ih-close:hover{background:var(--bg4);color:var(--text);}
+.inbox-items{flex:1;overflow-y:auto;padding:12px 18px;display:flex;flex-direction:column;gap:10px;}
+.inbox-item{background:var(--bg4);border:1px solid var(--border);border-radius:5px;padding:12px 14px;cursor:pointer;transition:all .15s;position:relative;}
+.inbox-item:hover{border-color:rgba(0,212,170,.3);background:var(--bg5);}
+.inbox-item.note-type{border-left:3px solid var(--gold);}
+.inbox-item.chat-type{border-left:3px solid var(--teal);}
+.inbox-item .ii-type{font-size:9px;letter-spacing:1.5px;font-family:'Orbitron',monospace;font-weight:700;margin-bottom:5px;}
+.inbox-item.note-type .ii-type{color:var(--gold);}
+.inbox-item.chat-type .ii-type{color:var(--teal);}
+.inbox-item .ii-from{font-size:12px;font-weight:700;color:var(--text);}
+.inbox-item .ii-subj{font-size:12px;color:var(--text-mid);margin-top:2px;}
+.inbox-item .ii-preview{font-size:11px;color:var(--text-dim);margin-top:4px;line-height:1.4;}
+.inbox-item .ii-time{position:absolute;top:10px;right:12px;font-size:10px;color:var(--text-dim);font-family:'Share Tech Mono',monospace;}
+.inbox-foot{padding:14px 18px;border-top:1px solid var(--border);display:flex;gap:8px;justify-content:flex-end;}
+
+/* ══ NOTE VIEWER MODAL ══ */
+#m-note-view .m-body{padding:18px 22px;}
+.nv-meta{display:flex;flex-wrap:wrap;gap:6px 18px;margin-bottom:14px;padding-bottom:12px;border-bottom:1px solid var(--border);font-size:11px;color:var(--text-dim);}
+.nv-meta b{color:var(--text);}
+.nv-subject{font-size:17px;font-weight:700;color:var(--teal);margin-bottom:12px;font-family:'Orbitron',monospace;letter-spacing:1px;}
+.nv-body{font-size:13px;color:var(--text);line-height:1.7;white-space:pre-wrap;background:var(--bg4);border:1px solid var(--border);border-radius:4px;padding:14px 16px;}
 </style>
 <script src="https://accounts.google.com/gsi/client" async defer></script>
 </head>
 <body>
-
-    <!-- ═══ FOTOS ═══ -->
-    <div class="module" id="mod-photos">
-      <div class="topbar">
-        <span class="topbar-title">🖼️ FOTOS</span>
-        <div class="topbar-sep"></div>
-        <div class="topbar-crumb" id="photos-crumb">Guardadas en Google Drive / DocVault / Fotos</div>
-        <div id="photos-pill" class="sync-pill idle"><div class="sp-dot"></div>Sin sincronizar</div>
-      </div>
-      <div class="content-area">
-        <div class="toolbar">
-          <button class="btn btn-solid" onclick="uploadPhoto()" id="upload-photo-btn">📷 Subir Foto</button>
-          <button class="btn btn-t" onclick="loadPhotos()">↺ Cargar</button>
-          <input type="file" id="photo-inp" accept="image/*" style="display:none" onchange="handlePhotoUpload(event)" multiple>
-          <div class="ml-auto" id="photos-count" style="font-size:11px;color:var(--text-dim)"></div>
-        </div>
-        <div class="content-scroll" id="photos-area">
-          <div class="empty-state"><div class="e-ico">🖼️</div><p>Conecta Google para ver tus fotos</p></div>
-        </div>
-      </div>
-    </div>
 
 <!-- ════════════════════════════════════
      GOOGLE AUTH SCREEN
@@ -422,93 +568,28 @@ select option{background:var(--bg3);}
   <div class="ga-bg"><div class="ga-grid"></div><div class="ga-scan"></div></div>
 
   <div class="ga-card">
-    <!-- STEP 0: System Login -->
+    <!-- STEP 0: Login principal -->
     <div class="ga-step active" id="step-0">
       <div class="ga-brand">
         <span class="vault-em">🗄️</span>
         <h1>DOCVAULT</h1>
         <div class="sub"><span>SISTEMA PROFESIONAL</span><span class="pro-badge">PRO</span></div>
       </div>
-      <label class="ga-field-label">Usuario del Sistema</label>
-      <input class="ga-input" id="inp-u" placeholder="Ingresa tu usuario" />
+
+      <!-- Login con usuario/contraseña -->
+      <label class="ga-field-label">Usuario</label>
+      <input class="ga-input" id="inp-u" placeholder="Ingresa tu usuario" autocomplete="username"/>
       <label class="ga-field-label">Contraseña</label>
-      <input class="ga-input" type="password" id="inp-p" placeholder="••••••••" style="margin-bottom:8px" />
+      <div class="ga-input-wrap" style="position:relative">
+        <input class="ga-input" type="password" id="inp-p" placeholder="••••••••" style="margin-bottom:8px;padding-right:44px" autocomplete="current-password"/>
+        <button class="ga-eye" type="button" onclick="togglePwd('inp-p',this)" tabindex="-1" style="position:absolute;right:13px;top:calc(50% - 8px);transform:translateY(-50%);background:none;border:none;color:var(--text-dim);cursor:pointer;font-size:16px;padding:4px">👁</button>
+      </div>
       <div class="ga-err" id="l-err">⚠ Credenciales incorrectas</div>
       <button class="ga-btn" onclick="doSystemLogin()">INGRESAR AL SISTEMA</button>
+
       <div class="ga-hint">Admin: admin / admin123</div>
     </div>
 
-    <!-- STEP 1: Choose Google Account -->
-    <div class="ga-step" id="step-1">
-      <div class="consent-header">
-        <svg width="28" height="28" viewBox="0 0 24 24"><path fill="#4285F4" d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z"/><path fill="#34A853" d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z"/><path fill="#FBBC05" d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l2.85-2.22.81-.62z"/><path fill="#EA4335" d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z"/></svg>
-        <div class="ch-info"><h2>Iniciar sesión con Google</h2><p>para continuar en DocVault PRO</p></div>
-      </div>
-      <p style="text-align:center;font-size:14px;color:var(--text-mid);margin-bottom:18px">Detectando tu cuenta Google conectada a Claude.ai...</p>
-      <div id="account-options" style="display:flex;flex-direction:column;gap:8px;margin-bottom:18px">
-        <div class="ai-thinking"><div class="dots"><span></span><span></span><span></span></div>Verificando cuenta Google...</div>
-      </div>
-      <button class="ga-btn-ghost" onclick="goStep(0)">← Usar acceso del sistema</button>
-    </div>
-
-    <!-- STEP 2: Consent -->
-    <div class="ga-step" id="step-2">
-      <div class="consent-header">
-        <svg width="26" height="26" viewBox="0 0 24 24"><path fill="#4285F4" d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z"/><path fill="#34A853" d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z"/><path fill="#FBBC05" d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l2.85-2.22.81-.62z"/><path fill="#EA4335" d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z"/></svg>
-        <div class="ch-info"><h2>Solicitud de acceso</h2><p>DocVault PRO quiere acceder a tu cuenta</p></div>
-      </div>
-      <div class="g-avatar" id="consent-av">?</div>
-      <div class="consent-email" id="consent-email">cargando...</div>
-      <div class="consent-title">DocVault PRO quiere acceder a:</div>
-      <div class="scope-list">
-        <div class="scope-item"><span class="s-icon">📧</span><div class="s-info"><div class="s-name">Gmail</div><div class="s-desc">Leer, enviar y organizar tu correo electrónico</div></div><span class="scope-check">✓</span></div>
-        <div class="scope-item"><span class="s-icon">📅</span><div class="s-info"><div class="s-name">Google Calendar</div><div class="s-desc">Ver y editar tus eventos y citas</div></div><span class="scope-check">✓</span></div>
-        <div class="scope-item"><span class="s-icon">👥</span><div class="s-info"><div class="s-name">Google Contacts</div><div class="s-desc">Ver y gestionar tus contactos</div></div><span class="scope-check">✓</span></div>
-        <div class="scope-item"><span class="s-icon">👤</span><div class="s-info"><div class="s-name">Información de tu perfil</div><div class="s-desc">Nombre, foto y dirección de email</div></div><span class="scope-check">✓</span></div>
-      </div>
-      <div class="consent-notice">Al hacer clic en "Permitir", das a DocVault PRO acceso a los permisos indicados. Tu información se mantiene segura dentro del sistema.</div>
-      <div class="consent-btns">
-        <button class="consent-deny" onclick="goStep(1)">Cancelar</button>
-        <button class="consent-allow" onclick="doGrantAccess()">✓ PERMITIR ACCESO</button>
-      </div>
-    </div>
-
-    <!-- STEP 3: Connecting -->
-    <div class="ga-step" id="step-3">
-      <div class="connecting-anim">
-        <div class="conn-ring"></div>
-        <div style="font-family:'Orbitron',monospace;font-size:13px;color:var(--teal);letter-spacing:2px;margin-bottom:4px">CONECTANDO</div>
-        <div style="font-size:12px;color:var(--text-dim)">Estableciendo conexión segura con Google...</div>
-      </div>
-      <div class="conn-steps" id="conn-steps">
-        <div class="conn-step" id="cs-1"><div class="cs-dot"></div>Verificando cuenta Google</div>
-        <div class="conn-step" id="cs-2"><div class="cs-dot"></div>Autorizando Gmail</div>
-        <div class="conn-step" id="cs-3"><div class="cs-dot"></div>Autorizando Google Calendar</div>
-        <div class="conn-step" id="cs-4"><div class="cs-dot"></div>Autorizando Google Contacts</div>
-        <div class="conn-step" id="cs-5"><div class="cs-dot"></div>Sincronizando perfil</div>
-      </div>
-    </div>
-
-    <!-- STEP 4: Success -->
-    <div class="ga-step" id="step-4">
-      <div class="success-check">✅</div>
-      <div style="text-align:center;font-family:'Orbitron',monospace;font-size:14px;color:var(--teal);letter-spacing:2px;margin-bottom:6px">ACCESO CONCEDIDO</div>
-      <div style="text-align:center;font-size:13px;color:var(--text-dim);margin-bottom:22px">Tu cuenta Google ha sido conectada exitosamente</div>
-      <div class="success-account">
-        <div class="sa-av" id="sa-av">G</div>
-        <div class="sa-info">
-          <div class="sa-name" id="sa-name">Cargando...</div>
-          <div class="sa-email" id="sa-email">—</div>
-          <div class="sa-scopes">
-            <span class="sa-scope-badge">GMAIL</span>
-            <span class="sa-scope-badge">CALENDAR</span>
-            <span class="sa-scope-badge">CONTACTS</span>
-            <span class="sa-scope-badge">PERFIL</span>
-          </div>
-        </div>
-      </div>
-      <button class="ga-btn" onclick="enterApp()">INGRESAR A DOCVAULT →</button>
-    </div>
   </div>
 </div>
 
@@ -524,10 +605,17 @@ select option{background:var(--bg3);}
     <div class="nav-btn" id="nb-calendar" onclick="switchMod('calendar')"><span class="nb-icon">📅</span><span class="nb-label">Citas</span></div>
     <div class="nav-btn" id="nb-contacts" onclick="switchMod('contacts')"><span class="nb-icon">👤</span><span class="nb-label">Contac.</span></div>
     <div class="nav-btn" id="nb-photos" onclick="switchMod('photos')"><span class="nb-icon">🖼️</span><span class="nb-label">Fotos</span></div>
+    <div class="nav-btn" id="nb-chat" onclick="switchMod('chat')" style="position:relative"><span class="nb-icon">💬</span><span class="nb-label">Chat</span><span id="chat-badge" style="display:none;position:absolute;top:3px;right:3px;background:var(--red);color:#fff;font-size:7px;font-weight:700;padding:1px 4px;border-radius:8px;line-height:1.4">!</span></div>
+    <div class="nav-btn" id="nb-notes" onclick="switchMod('notes')" style="position:relative"><span class="nb-icon">📝</span><span class="nb-label">Notas</span><span id="notes-badge" style="display:none;position:absolute;top:3px;right:3px;background:var(--gold);color:#000;font-size:7px;font-weight:700;padding:1px 4px;border-radius:8px;line-height:1.4">0</span></div>
     <div class="nav-sep"></div>
     <div class="nav-btn" id="nb-users" onclick="switchMod('users')" style="display:none"><span class="nb-icon">👥</span><span class="nb-label">Usuarios</span></div>
     <div class="nav-btn" id="nb-settings" onclick="switchMod('settings')"><span class="nb-icon">⚙️</span><span class="nb-label">Config</span></div>
     <div class="nav-spacer"></div>
+    <!-- Google connection label -->
+    <div id="nav-google-status" title="Estado Google" style="display:flex;flex-direction:column;align-items:center;gap:3px;margin-bottom:6px;cursor:default">
+      <div id="nav-google-dot" style="width:8px;height:8px;border-radius:50%;background:var(--text-dim);transition:all .3s;box-shadow:none"></div>
+      <span id="nav-google-lbl" style="font-size:6.5px;letter-spacing:.5px;color:var(--text-dim);text-transform:uppercase;font-weight:700;line-height:1">GOOGLE</span>
+    </div>
     <div class="nav-av-btn" id="nav-av" onclick="togglePop()">A</div>
   </div>
 
@@ -745,11 +833,14 @@ select option{background:var(--bg3);}
             </div>
             <div id="set-google-form">
               <div style="font-size:12px;color:var(--text-dim);margin-bottom:18px;line-height:1.6">
-                Conecta tu cuenta Google para guardar documentos y fotos en <b>Google Drive</b>, y acceder a Gmail y Calendar.
+                Conecta tu cuenta Google para acceder a <b>Gmail</b> y <b>Google Calendar</b> directamente desde DocVault.
               </div>
-              <div id="g-signin-btn" style="margin-bottom:10px"></div>
-              <div style="font-size:11px;color:var(--text-dim);margin-top:8px;line-height:1.6">
-                🔒 Autenticación oficial de Google. Tus archivos se guardan en tu propio Drive, seguros y accesibles desde cualquier dispositivo.
+              <button class="google-btn" onclick="triggerGoogleOAuth()" style="margin-bottom:10px">
+                <svg width="20" height="20" viewBox="0 0 24 24"><path fill="#4285F4" d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z"/><path fill="#34A853" d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z"/><path fill="#FBBC05" d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l2.85-2.22.81-.62z"/><path fill="#EA4335" d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z"/></svg>
+                Conectar con Google
+              </button>
+              <div style="font-size:11px;color:var(--text-dim);line-height:1.6">
+                🔒 Se abrirá una ventana de Google donde ingresas tus datos. DocVault nunca ve tu contraseña.
               </div>
             </div>
           </div>
@@ -764,10 +855,209 @@ select option{background:var(--bg3);}
         </div>
       </div>
     </div>
+
+    <!-- ═══ FOTOS ═══ -->
+    <div class="module" id="mod-photos">
+      <div class="topbar">
+        <span class="topbar-title">🖼️ FOTOS</span>
+        <div class="topbar-sep"></div>
+        <div class="topbar-crumb">Guardadas en Google Drive / DocVault / Fotos</div>
+        <div id="photos-pill" class="sync-pill idle"><div class="sp-dot"></div>Sin sincronizar</div>
+      </div>
+      <div class="content-area">
+        <div class="toolbar">
+          <button class="btn btn-solid" onclick="uploadPhoto()">📷 Subir Foto</button>
+          <button class="btn btn-t" onclick="loadPhotos()">↺ Cargar</button>
+          <input type="file" id="photo-inp" accept="image/*" style="display:none" onchange="handlePhotoUpload(event)" multiple>
+          <div class="ml-auto" id="photos-count" style="font-size:11px;color:var(--text-dim)"></div>
+        </div>
+        <div class="content-scroll" id="photos-area">
+          <div class="empty-state"><div class="e-ico">🖼️</div><p>Conecta Google para ver tus fotos</p></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ═══ CHAT ═══ -->
+    <div class="module" id="mod-chat">
+      <div class="chat-wrap">
+        <!-- Sidebar de conversaciones -->
+        <div class="chat-sidebar">
+          <div class="chat-sidebar-head">
+            <div style="display:flex;align-items:center;gap:10px">
+              <div id="chat-my-av" style="width:36px;height:36px;border-radius:50%;background:linear-gradient(135deg,#00a884,#006e57);display:flex;align-items:center;justify-content:center;font-size:14px;font-weight:700;color:#fff;overflow:hidden;flex-shrink:0"></div>
+              <span style="font-size:17px;font-weight:700;color:#e9edef;flex:1">Chats</span>
+            </div>
+            <button onclick="openChatSetup()" title="Configurar Firebase" style="background:none;border:none;color:#8696a0;font-size:20px;cursor:pointer;padding:4px" title="Configuración">⚙</button>
+          </div>
+          <div class="chat-room-list">
+            <div class="chat-room-item active" id="cr-family" onclick="selectChatRoom('family','Familia','💑')">
+              <div class="cr-av">💑</div>
+              <div class="cr-info">
+                <div class="cr-name">Familia</div>
+                <div class="cr-last" id="crl-family">Toca para chatear</div>
+              </div>
+            </div>
+            <div class="chat-room-item" id="cr-notas" onclick="selectChatRoom('notas','Notas rápidas','📝')">
+              <div class="cr-av">📝</div>
+              <div class="cr-info">
+                <div class="cr-name">Notas rápidas</div>
+                <div class="cr-last" id="crl-notas">Toca para chatear</div>
+              </div>
+            </div>
+            <div class="chat-room-item" id="cr-general" onclick="selectChatRoom('general','General','💬')">
+              <div class="cr-av">💬</div>
+              <div class="cr-info">
+                <div class="cr-name">General</div>
+                <div class="cr-last" id="crl-general">Toca para chatear</div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Área principal -->
+        <div class="chat-main">
+          <!-- Topbar estilo WhatsApp -->
+          <div class="chat-topbar">
+            <div class="ct-av" id="chat-room-av">💑</div>
+            <div class="ct-info">
+              <div class="ct-name" id="chat-room-title">FAMILIA</div>
+              <div class="ct-status" id="chat-partner-status">
+                <div class="ct-online"><div class="dot-off" id="chat-partner-dot"></div><span id="chat-partner-lbl">Sin conexión</span></div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Setup -->
+          <div id="chat-setup" class="chat-setup" style="display:none">
+            <b>⚡ Configuración del Chat</b><br>
+            Necesitas una <b>Firebase Realtime Database</b> gratuita.<br>
+            <input id="fb-url" type="text" placeholder="https://tu-proyecto-rtdb.firebaseio.com">
+            <input id="chat-myname" type="text" placeholder="Tu nombre (ej: Carlos)">
+            <button class="btn btn-solid" style="width:100%;justify-content:center;margin-top:6px" onclick="saveChatSetup()">💾 Guardar y Conectar</button>
+            <div style="margin-top:8px;font-size:10px;color:#8696a0">Crea DB gratis en <b>console.firebase.google.com</b> → Realtime Database → modo prueba</div>
+          </div>
+
+          <!-- Mensajes -->
+          <div class="chat-messages" id="chat-msgs">
+            <div class="chat-empty" id="chat-empty-state">
+              <div class="ce-ico">💬</div>
+              <p>Configura Firebase para chatear<br>en tiempo real</p>
+              <button class="btn btn-t" style="margin-top:6px" onclick="openChatSetup()">⚙️ Configurar ahora</button>
+            </div>
+          </div>
+
+          <!-- Input estilo WhatsApp -->
+          <div class="chat-input-bar">
+            <div class="chat-inp-wrap">
+              <button class="chat-icon-btn" title="Emoji">😊</button>
+              <textarea class="chat-inp" id="chat-inp" placeholder="Escribe un mensaje" rows="1"
+                onkeydown="if(event.key==='Enter'&&!event.shiftKey){event.preventDefault();sendChat();}"
+                oninput="this.style.height='auto';this.style.height=Math.min(this.scrollHeight,110)+'px'"></textarea>
+            </div>
+            <button class="chat-send" onclick="sendChat()" id="chat-send-btn" title="Enviar">
+              <svg viewBox="0 0 24 24" width="22" height="22" fill="currentColor"><path d="M1.101 21.757L23.8 12.028 1.101 2.3l.011 7.912 13.623 1.816-13.623 1.817-.011 7.912z"/></svg>
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ═══ NOTAS ═══ -->
+    <div class="module" id="mod-notes">
+      <div class="topbar">
+        <span class="topbar-title">📝 NOTAS</span>
+        <div class="topbar-sep"></div>
+        <div class="topbar-crumb" id="notes-crumb">Notas internas entre usuarios</div>
+        <div id="notes-filter" style="display:flex;gap:5px;margin-left:auto">
+          <button class="btn btn-ghost" id="nf-all" onclick="filterNotes('all')" style="font-size:10px;padding:4px 10px">Todas</button>
+          <button class="btn btn-t" id="nf-inbox" onclick="filterNotes('inbox')" style="font-size:10px;padding:4px 10px">📥 Para mí</button>
+          <button class="btn btn-ghost" id="nf-sent" onclick="filterNotes('sent')" style="font-size:10px;padding:4px 10px">📤 Enviadas</button>
+        </div>
+      </div>
+      <div style="display:flex;flex:1;overflow:hidden">
+        <div class="side-panel" style="width:200px">
+          <div class="side-head"><h3>Acciones</h3></div>
+          <div class="side-list">
+            <button class="btn btn-solid" style="width:100%;justify-content:center;margin-bottom:10px" onclick="openNewNote()">✏️ Nueva Nota</button>
+            <div class="s-label">Estado</div>
+            <div id="notes-stats" style="display:flex;flex-direction:column;gap:6px;margin-top:6px">
+              <div style="display:flex;justify-content:space-between;font-size:11px;padding:6px 4px">
+                <span style="color:var(--text-dim)">Sin leer</span>
+                <span id="ns-unread" style="color:var(--gold);font-weight:700">0</span>
+              </div>
+              <div style="display:flex;justify-content:space-between;font-size:11px;padding:6px 4px">
+                <span style="color:var(--text-dim)">Total recibidas</span>
+                <span id="ns-total" style="color:var(--teal);font-weight:700">0</span>
+              </div>
+              <div style="display:flex;justify-content:space-between;font-size:11px;padding:6px 4px">
+                <span style="color:var(--text-dim)">Enviadas</span>
+                <span id="ns-sent" style="color:var(--text-mid);font-weight:700">0</span>
+              </div>
+            </div>
+          </div>
+        </div>
+        <div class="content-area">
+          <div class="notes-grid" id="notes-area">
+            <div class="empty-state" style="grid-column:1/-1"><div class="e-ico">📝</div><p>No hay notas aún</p></div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+  </div><!-- /app-body -->
+</div><!-- /app -->
+
+<!-- ═══ INBOX POPUP ═══ -->
+<div id="inbox-popup">
+  <div class="inbox-card">
+    <div class="inbox-head">
+      <span class="ih-icon">📬</span>
+      <h2>TIENES MENSAJES NUEVOS</h2>
+      <button class="ih-close" onclick="closeInboxPopup()">✕</button>
+    </div>
+    <div class="inbox-items" id="inbox-items"></div>
+    <div class="inbox-foot">
+      <button class="btn btn-ghost" onclick="closeInboxPopup()">Cerrar</button>
+      <button class="btn btn-solid" onclick="closeInboxPopup();switchMod('notes')">📝 Ver Notas</button>
+    </div>
   </div>
 </div>
 
-<!-- ═══ MODALS ═══ -->
+<!-- ═══ NOTA NUEVA MODAL ═══ -->
+<div class="overlay" id="m-note-new">
+  <div class="modal wide">
+    <div class="m-head"><h2>✏️ NUEVA NOTA</h2><button class="m-close" onclick="closeM('m-note-new')">✕</button></div>
+    <div class="m-body">
+      <label class="m-label">Para</label>
+      <select class="m-sel" id="nn-to"></select>
+      <label class="m-label">Asunto</label>
+      <input class="m-inp" id="nn-subject" placeholder="Asunto de la nota">
+      <label class="m-label">Mensaje</label>
+      <textarea class="m-ta" id="nn-body" placeholder="Escribe tu nota aquí..." style="min-height:140px"></textarea>
+      <div style="display:flex;align-items:center;gap:8px;margin-top:4px">
+        <input type="checkbox" id="nn-urgent" style="accent-color:var(--gold)">
+        <label for="nn-urgent" style="font-size:12px;color:var(--text-dim);cursor:pointer">⚠️ Marcar como urgente</label>
+      </div>
+    </div>
+    <div class="m-foot">
+      <button class="btn-cancel" onclick="closeM('m-note-new')">Cancelar</button>
+      <button class="btn-confirm" onclick="sendNote()">📤 ENVIAR NOTA</button>
+    </div>
+  </div>
+</div>
+
+<!-- ═══ NOTA VIEWER MODAL ═══ -->
+<div class="overlay" id="m-note-view">
+  <div class="modal wide" id="m-note-view">
+    <div class="m-head"><h2>📝 NOTA</h2><button class="m-close" onclick="closeM('m-note-view')">✕</button></div>
+    <div class="m-body">
+      <div class="nv-meta" id="nv-meta"></div>
+      <div class="nv-subject" id="nv-subject"></div>
+      <div class="nv-body" id="nv-body"></div>
+      <div style="margin-top:12px;display:flex;gap:8px" id="nv-actions"></div>
+    </div>
+  </div>
+</div>
 <!-- Folder -->
 <div class="overlay" id="m-folder"><div class="modal"><div class="m-head"><h2>NUEVA CARPETA</h2><button class="m-close" onclick="closeM('m-folder')">✕</button></div><div class="m-body"><label class="m-label">Nombre</label><input class="m-inp" id="fi-name" placeholder="Ej: Contratos 2024"><label class="m-label">Ícono</label><select class="m-sel" id="fi-icon"><option value="📁">📁 General</option><option value="📋">📋 Contratos</option><option value="💼">💼 Trabajo</option><option value="🏠">🏠 Personal</option><option value="💰">💰 Finanzas</option><option value="⚖️">⚖️ Legal</option><option value="🏥">🏥 Médico</option><option value="🎓">🎓 Educación</option><option value="📸">📸 Fotos</option><option value="🔒">🔒 Confidencial</option></select><label class="m-label">Acceso</label><select class="m-sel" id="fi-access"><option value="all">Todos los usuarios</option><option value="admin">Solo Administradores</option></select></div><div class="m-foot"><button class="btn-cancel" onclick="closeM('m-folder')">Cancelar</button><button class="btn-confirm" onclick="saveFolder()">CREAR</button></div></div></div>
 
@@ -781,7 +1071,53 @@ select option{background:var(--bg3);}
 <div class="overlay" id="m-event"><div class="modal wide"><div class="m-head"><h2>📅 NUEVA CITA</h2><button class="m-close" onclick="closeM('m-event')">✕</button></div><div class="m-body"><label class="m-label">Título</label><input class="m-inp" id="ev-title" placeholder="Ej: Reunión con cliente"><div class="m-row"><div><label class="m-label">Inicio</label><input class="m-inp" id="ev-start" type="datetime-local"></div><div><label class="m-label">Fin</label><input class="m-inp" id="ev-end" type="datetime-local"></div></div><label class="m-label">Descripción</label><textarea class="m-ta" id="ev-desc" placeholder="Descripción..."></textarea><label class="m-label">Ubicación</label><input class="m-inp" id="ev-loc" placeholder="Oficina, Zoom, Google Meet..."><label class="m-label">Invitados</label><div style="display:flex;gap:7px"><input class="m-inp" id="ev-att" placeholder="email1, email2..." style="flex:1;margin-bottom:0"><button class="btn btn-ghost" style="font-size:10px;padding:10px 10px;white-space:nowrap;flex-shrink:0" onclick="openCPicker('ev-att')">👤 Contactos</button></div><div id="event-msg" style="margin-top:10px"></div></div><div class="m-foot"><button class="btn-cancel" onclick="closeM('m-event')">Cancelar</button><button class="btn-confirm" onclick="createEvent()">📅 CREAR CITA</button></div></div></div>
 
 <!-- User -->
-<div class="overlay" id="m-user"><div class="modal"><div class="m-head"><h2>NUEVO USUARIO</h2><button class="m-close" onclick="closeM('m-user')">✕</button></div><div class="m-body"><label class="m-label">Usuario</label><input class="m-inp" id="nu-u" placeholder="nombre_usuario"><label class="m-label">Contraseña</label><input class="m-inp" id="nu-p" type="password" placeholder="••••••••"><label class="m-label">Rol</label><select class="m-sel" id="nu-r"><option value="admin">Administrador</option><option value="viewer">Visualizador</option></select></div><div class="m-foot"><button class="btn-cancel" onclick="closeM('m-user')">Cancelar</button><button class="btn-confirm" onclick="saveUser()">CREAR</button></div></div></div>
+<div class="overlay" id="m-user"><div class="modal" style="max-width:480px"><div class="m-head"><h2 id="m-user-title">NUEVO USUARIO</h2><button class="m-close" onclick="closeM('m-user')">✕</button></div><div class="m-body">
+
+  <!-- Avatar Upload -->
+  <div class="avatar-upload-wrap">
+    <div class="avatar-preview" id="nu-avatar-preview" onclick="document.getElementById('nu-avatar-file').click()">
+      <span id="nu-avatar-letter">A</span>
+    </div>
+    <div class="avatar-hint">Haz clic para cambiar la foto de perfil</div>
+    <input type="file" id="nu-avatar-file" accept="image/*" style="display:none" onchange="previewAvatar(event)">
+    <input type="hidden" id="nu-avatar-data">
+  </div>
+
+  <label class="m-label">Usuario</label><input class="m-inp" id="nu-u" placeholder="nombre_usuario" oninput="document.getElementById('nu-avatar-letter').textContent=this.value[0]?.toUpperCase()||'A'">
+  <label class="m-label">Contraseña</label><input class="m-inp" id="nu-p" type="password" placeholder="••••••••">
+  <label class="m-label">Rol</label>
+  <select class="m-sel" id="nu-r" onchange="togglePermUI()">
+    <option value="admin">Administrador (acceso total)</option>
+    <option value="viewer">Personalizado</option>
+  </select>
+  <div id="nu-perms" style="display:none;margin-top:14px">
+    <div style="font-size:10px;letter-spacing:2px;color:var(--text-dim);text-transform:uppercase;margin-bottom:10px">Módulos permitidos</div>
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px">
+      <label style="display:flex;align-items:center;gap:8px;padding:9px 12px;background:var(--bg4);border:1px solid var(--border);border-radius:4px;cursor:pointer;font-size:12px;font-weight:600">
+        <input type="checkbox" id="p-docs" checked style="accent-color:var(--teal)"> 📁 Documentos
+      </label>
+      <label style="display:flex;align-items:center;gap:8px;padding:9px 12px;background:var(--bg4);border:1px solid var(--border);border-radius:4px;cursor:pointer;font-size:12px;font-weight:600">
+        <input type="checkbox" id="p-email" style="accent-color:var(--teal)"> ✉️ Email
+      </label>
+      <label style="display:flex;align-items:center;gap:8px;padding:9px 12px;background:var(--bg4);border:1px solid var(--border);border-radius:4px;cursor:pointer;font-size:12px;font-weight:600">
+        <input type="checkbox" id="p-calendar" style="accent-color:var(--teal)"> 📅 Calendario
+      </label>
+      <label style="display:flex;align-items:center;gap:8px;padding:9px 12px;background:var(--bg4);border:1px solid var(--border);border-radius:4px;cursor:pointer;font-size:12px;font-weight:600">
+        <input type="checkbox" id="p-contacts" style="accent-color:var(--teal)"> 👤 Contactos
+      </label>
+      <label style="display:flex;align-items:center;gap:8px;padding:9px 12px;background:var(--bg4);border:1px solid var(--border);border-radius:4px;cursor:pointer;font-size:12px;font-weight:600">
+        <input type="checkbox" id="p-photos" style="accent-color:var(--teal)"> 🖼️ Fotos
+      </label>
+      <label style="display:flex;align-items:center;gap:8px;padding:9px 12px;background:var(--bg4);border:1px solid var(--border);border-radius:4px;cursor:pointer;font-size:12px;font-weight:600">
+        <input type="checkbox" id="p-chat" checked style="accent-color:var(--teal)"> 💬 Chat
+      </label>
+      <label style="display:flex;align-items:center;gap:8px;padding:9px 12px;background:var(--bg4);border:1px solid var(--border);border-radius:4px;cursor:pointer;font-size:12px;font-weight:600">
+        <input type="checkbox" id="p-notes" checked style="accent-color:var(--teal)"> 📝 Notas
+      </label>
+    </div>
+  </div>
+  <input type="hidden" id="nu-id">
+</div><div class="m-foot"><button class="btn-cancel" onclick="closeM('m-user')">Cancelar</button><button class="btn-confirm" onclick="saveUser()">CREAR</button></div></div></div>
 
 <!-- Move -->
 <div class="overlay" id="m-move"><div class="modal"><div class="m-head"><h2>MOVER DOCUMENTO</h2><button class="m-close" onclick="closeM('m-move')">✕</button></div><div class="m-body"><label class="m-label">Mover a</label><select class="m-sel" id="mv-f"></select></div><div class="m-foot"><button class="btn-cancel" onclick="closeM('m-move')">Cancelar</button><button class="btn-confirm" onclick="confirmMove()">MOVER</button></div></div></div>
@@ -836,103 +1172,78 @@ async function svD(){try{await window.storage.set('dv3-docs',JSON.stringify(S.do
 // ══ GOOGLE AUTH FLOW ═══════════════════════════════
 function goStep(n){document.querySelectorAll('.ga-step').forEach(s=>s.classList.remove('active'));document.getElementById('step-'+n).classList.add('active');}
 
-async function startGoogleFlow(){
-  goStep(1);
-  try{
-    const data=await callAI('Get the email address of the currently authenticated Gmail user. Return ONLY the email address.','Use Gmail tools to get current user email.',GMAIL);
-    const raw=(getText(data)||getMcp(data)).trim();
-    const email=raw.match(/[\w.+\-]+@[\w\-]+\.[a-z.]+/i)?.[0]||raw||'usuario@gmail.com';
-    S.googleEmail=email;
-    S.googleName=email.split('@')[0].replace(/[._]/g,' ').replace(/\b\w/g,c=>c.toUpperCase());
-    const opts=document.getElementById('account-options');
-    opts.innerHTML=`
-      <div onclick="showConsent()" style="display:flex;align-items:center;gap:12px;padding:14px 16px;background:var(--bg4);border:1px solid var(--border);border-radius:5px;cursor:pointer;transition:all .15s;" onmouseover="this.style.borderColor='rgba(0,212,170,.35)'" onmouseout="this.style.borderColor='var(--border)'">
-        <div style="width:42px;height:42px;border-radius:50%;background:linear-gradient(135deg,#4285f4,#34a853);display:flex;align-items:center;justify-content:center;font-size:16px;font-weight:700;color:#fff;flex-shrink:0">${email[0].toUpperCase()}</div>
-        <div style="flex:1"><div style="font-size:14px;font-weight:700">${S.googleName}</div><div style="font-size:12px;color:var(--text-dim);font-family:'Share Tech Mono',monospace">${email}</div></div>
-        <span style="color:var(--teal);font-size:18px">›</span>
-      </div>
-      <div style="text-align:center;font-size:11px;color:var(--text-dim);margin-top:6px">Haz clic para continuar con esta cuenta</div>`;
-  }catch(e){
-    document.getElementById('account-options').innerHTML=`<div style="color:var(--red);font-size:12px;text-align:center;padding:10px">⚠ No se pudo detectar la cuenta Google.<br>Verifica que Gmail esté conectado en Claude.ai.<br><br><button class="ga-btn-ghost" onclick="goStep(0)">← Volver</button></div>`;
-  }
-}
-
-function showConsent(){
-  document.getElementById('consent-av').textContent=S.googleEmail?S.googleEmail[0].toUpperCase():'G';
-  document.getElementById('consent-email').textContent=S.googleEmail||'—';
-  goStep(2);
-}
-
-async function doGrantAccess(){
-  goStep(3);
-  const steps=[
-    {id:'cs-1',label:'Cuenta Google verificada ✓',delay:600},
-    {id:'cs-2',label:'Gmail autorizado ✓',delay:1100},
-    {id:'cs-3',label:'Google Calendar autorizado ✓',delay:1600},
-    {id:'cs-4',label:'Google Contacts autorizado ✓',delay:2100},
-    {id:'cs-5',label:'Perfil sincronizado ✓',delay:2600},
-  ];
-  steps.forEach((s,i)=>{
-    // set current active
-    if(i>0) setTimeout(()=>document.getElementById(steps[i-1].id).classList.add('done'),s.delay-50);
-    setTimeout(()=>document.getElementById(s.id).classList.add('active'),s.delay);
-  });
-  // run real sync in parallel
-  let email=S.googleEmail;
-  try{
-    const data=await callAI('Get the Gmail user email and full name if available. Return JSON: {"email":"...","name":"..."}','Use Gmail tools.',GMAIL);
-    let txt=(getText(data)||getMcp(data)).replace(/```json|```/g,'').trim();
-    try{const j=JSON.parse(txt);email=j.email||email;S.googleName=j.name||S.googleName;}catch{}
-    S.googleEmail=email;
-  }catch{}
-  setTimeout(()=>{
-    steps.forEach(s=>document.getElementById(s.id).classList.add('done'));
-    document.getElementById('sa-av').textContent=S.googleEmail[0].toUpperCase();
-    document.getElementById('sa-name').textContent=S.googleName||S.googleEmail.split('@')[0];
-    document.getElementById('sa-email').textContent=S.googleEmail;
-    setTimeout(()=>goStep(4),400);
-  },3000);
-}
 
 function enterApp(){
-  // Complete the login - use first admin or auto-create session
   let user=S.users.find(u=>u.role==='admin');
   if(!user) user=S.users[0];
   S.currentUser=user;
   S.currentUser._googleEmail=S.googleEmail;
   document.getElementById('google-auth-screen').style.display='none';
-  document.getElementById('app').style.display='flex';
+  document.getElementById('app').classList.add('visible');
   updateProfileUI();
-  if(user.role==='admin'){
-    document.getElementById('nb-users').style.display='flex';
-    document.getElementById('new-folder-btn').style.display='';
-    document.getElementById('upload-btn').style.display='';
-  }
-  // Update settings google section
+  updateNavGoogleLabel(true);
+  applyNavPerms();
   updateGoogleSettingsUI();
   setSyncAll('ok');
   renderFolders(); updateStats(); renderUsers(); initCal();
   toast('✅ Conectado como '+S.googleEmail);
+  setTimeout(()=>{ if(typeof showInboxPopup==='function') showInboxPopup(); }, 700);
 }
 
 // System login (no Google)
-function doSystemLogin(){
-  const u=document.getElementById('inp-u').value.trim();
-  const p=document.getElementById('inp-p').value;
-  const usr=S.users.find(x=>x.username===u&&x.password===p);
-  if(!usr){document.getElementById('l-err').style.display='block';return;}
-  S.currentUser=usr;
-  document.getElementById('google-auth-screen').style.display='none';
-  document.getElementById('app').style.display='flex';
-  updateProfileUI();
-  if(usr.role==='admin'){
-    document.getElementById('nb-users').style.display='flex';
-    document.getElementById('new-folder-btn').style.display='';
-    document.getElementById('upload-btn').style.display='';
-  }
-  renderFolders(); updateStats(); renderUsers(); initCal();
+
+// ── Mostrar/ocultar contraseña ───────────────────────
+function togglePwd(inputId, btn){
+  const inp = document.getElementById(inputId);
+  if(!inp) return;
+  const show = inp.type === 'password';
+  inp.type = show ? 'text' : 'password';
+  btn.textContent = show ? '🙈' : '👁';
 }
-document.addEventListener('keydown',e=>{if(e.key==='Enter'){const ls=document.getElementById('google-auth-screen');if(ls&&ls.style.display!=='none'&&document.getElementById('step-0').classList.contains('active'))doSystemLogin();}});
+
+// ── Login con usuario/email + contraseña ─────────────
+function doSystemLogin(){
+  const u = document.getElementById('inp-u').value.trim();
+  const p = document.getElementById('inp-p').value;
+  const errEl = document.getElementById('l-err');
+
+  // Si por algún motivo los usuarios no cargaron aún, dar admin de emergencia
+  if(!S.users || !S.users.length){
+    S.users=[{id:'u1',username:'admin',password:'admin123',role:'admin'}];
+  }
+
+  const usr = S.users.find(x =>
+    (x.username === u || (x.email && x.email.toLowerCase() === u.toLowerCase())) && x.password === p
+  );
+
+  if(!usr){
+    // Mostrar cuántos usuarios hay para diagnóstico
+    const hint = S.users.length === 0 ? '⚠ No hay usuarios cargados. Recarga la página.' : '⚠ Usuario o contraseña incorrectos';
+    errEl.textContent = hint;
+    errEl.style.display = 'block';
+    return;
+  }
+
+  errEl.style.display = 'none';
+  S.currentUser = usr;
+  document.getElementById('google-auth-screen').style.display='none';
+  document.getElementById('app').classList.add('visible');
+  updateProfileUI();
+  updateNavGoogleLabel(false);
+  applyNavPerms();
+  renderFolders(); updateStats(); renderUsers(); initCal();
+  setTimeout(()=>{ if(typeof showInboxPopup==='function') showInboxPopup(); }, 500);
+}
+
+
+document.addEventListener('keydown',e=>{
+  if(e.key==='Enter'){
+    const ls=document.getElementById('google-auth-screen');
+    if(ls&&ls.style.display!=='none'&&document.getElementById('step-0').classList.contains('active')){
+      doSystemLogin();
+    }
+  }
+});
 
 function doLogout(){
   S.currentUser=null;S.currentFolder=null;S.googleEmail='';S.googleName='';S.calEvents=[];
@@ -945,23 +1256,31 @@ function doLogout(){
   resetPills();
 }
 
+function updateNavGoogleLabel(connected){
+  const dot = document.getElementById('nav-google-dot');
+  const lbl = document.getElementById('nav-google-lbl');
+  if(!dot) return;
+  if(connected && S.googleEmail){
+    dot.style.background = '#1ed760';
+    dot.style.boxShadow = '0 0 6px rgba(30,215,96,.7)';
+    dot.title = S.googleEmail;
+    lbl.style.color = '#1ed760';
+  } else {
+    dot.style.background = 'var(--text-dim)';
+    dot.style.boxShadow = 'none';
+    lbl.style.color = 'var(--text-dim)';
+  }
+}
+
 function updateProfileUI(){
   const u=S.currentUser;
   if(!u) return;
-  const av=u.username[0].toUpperCase();
-  const gColor=S.googleEmail?'linear-gradient(135deg,#4285f4,#34a853)':'var(--teal)';
-  const textColor=S.googleEmail?'#fff':'#000';
-  ['nav-av','pp-av'].forEach(id=>{
-    const el=document.getElementById(id);
-    if(!el) return;
-    el.textContent=S.googleEmail?S.googleEmail[0].toUpperCase():av;
-    el.style.background=gColor;
-    el.style.color=textColor;
-  });
-  document.getElementById('pp-name').textContent=u.username;
-  document.getElementById('pp-role').textContent=u.role==='admin'?'ADMINISTRADOR':'VISUALIZADOR';
-  document.getElementById('pp-google').textContent=S.googleEmail||'Sin Google conectado';
-  document.getElementById('curr-user-lbl').textContent=u.username;
+  document.getElementById('pp-name').textContent = u.displayName || u.username;
+  document.getElementById('pp-role').textContent = u.role==='admin'?'ADMINISTRADOR':'USUARIO';
+  document.getElementById('pp-google').textContent = S.googleEmail || u.email || 'Sin Google conectado';
+  const lbl = document.getElementById('curr-user-lbl');
+  if(lbl) lbl.textContent = u.displayName || u.username;
+  updateNavAvatar();
 }
 
 function updateGoogleSettingsUI(){
@@ -1203,14 +1522,215 @@ async function createEvent(){
 }
 
 // ══ USERS ══════════════════════════════════════════
-function renderUsers(){
-  const a=S.users.filter(u=>u.role==='admin').length;const v=S.users.filter(u=>u.role==='viewer').length;
-  document.getElementById('uu-t').textContent=S.users.length;document.getElementById('uu-a').textContent=a;document.getElementById('uu-v').textContent=v;
-  document.getElementById('users-list').innerHTML=S.users.map(u=>`<div class="user-card"><div class="u-av ${u.role}">${u.username[0].toUpperCase()}</div><div class="u-info"><div class="u-name">${u.username}${u.id===S.currentUser?.id?' <span style="font-size:10px;color:var(--teal)">(tú)</span>':''}</div><div class="u-role ${u.role}">${u.role==='admin'?'Administrador':'Visualizador'}</div></div><span class="badge ${u.role}">${u.role.toUpperCase()}</span><div style="display:flex;gap:5px">${u.id!=='u1'&&u.id!==S.currentUser?.id?`<button class="btn btn-r" style="font-size:10px;padding:5px 9px" onclick="delUser('${u.id}')">🗑 Eliminar</button>`:''}</div></div>`).join('');
+const PERM_LABELS = {docs:'📁 Docs', email:'✉️ Email', calendar:'📅 Cal', contacts:'👤 Contact', photos:'🖼️ Fotos', chat:'💬 Chat', notes:'📝 Notas'};
+
+function togglePermUI(){
+  const r = document.getElementById('nu-r').value;
+  document.getElementById('nu-perms').style.display = r === 'viewer' ? 'block' : 'none';
 }
-function openUserM(){document.getElementById('nu-u').value='';document.getElementById('nu-p').value='';openM('m-user');}
-async function saveUser(){const u=document.getElementById('nu-u').value.trim();const p=document.getElementById('nu-p').value;const r=document.getElementById('nu-r').value;if(!u||!p)return toast('Completa todos los campos','err');if(S.users.find(x=>x.username===u))return toast('Usuario ya existe','err');S.users.push({id:'u'+Date.now(),username:u,password:p,role:r});await svU();closeM('m-user');renderUsers();toast('Usuario creado ✓');}
+
+function getPermsFromForm(){
+  if(document.getElementById('nu-r').value === 'admin') return null; // null = all
+  const perms = {};
+  ['docs','email','calendar','contacts','photos','chat','notes'].forEach(k => {
+    perms[k] = document.getElementById('p-'+k).checked;
+  });
+  return perms;
+}
+
+function setPermsToForm(perms){
+  if(!perms){ ['docs','email','calendar','contacts','photos','chat','notes'].forEach(k=>document.getElementById('p-'+k).checked=true); return; }
+  ['docs','email','calendar','contacts','photos','chat','notes'].forEach(k => {
+    document.getElementById('p-'+k).checked = !!perms[k];
+  });
+}
+
+function canAccessMod(mod){
+  const u = S.currentUser;
+  if(!u) return false;
+  if(u.role === 'admin') return true;
+  if(!u.perms) return true; // legacy viewer
+  return !!u.perms[mod];
+}
+
+function applyNavPerms(){
+  const mods = ['docs','email','calendar','contacts','photos','chat','notes','users','settings'];
+  mods.forEach(m => {
+    const btn = document.getElementById('nb-'+m);
+    if(!btn) return;
+    if(m === 'users' || m === 'settings') {
+      btn.style.display = S.currentUser?.role === 'admin' ? '' : 'none';
+    } else if(m === 'notes') {
+      btn.style.display = ''; // notes always visible (everyone can receive notes)
+    } else {
+      btn.style.display = canAccessMod(m) ? '' : 'none';
+    }
+  });
+  // Go to first visible mod if current is hidden
+  const active = document.querySelector('.module.active');
+  if(active){
+    const modId = active.id.replace('mod-','');
+    if(!canAccessMod(modId) && modId !== 'settings' && modId !== 'users'){
+      const first = ['docs','email','calendar','contacts','photos','chat'].find(m=>canAccessMod(m));
+      if(first) switchMod(first);
+    }
+  }
+}
+
+function renderUsers(){
+  if(S.currentUser?.role !== 'admin'){ document.getElementById('users-list').innerHTML='<div class="empty-state"><div class="e-ico">🔒</div><p>Solo el administrador puede gestionar usuarios</p></div>'; return; }
+  const a=S.users.filter(u=>u.role==='admin').length;const v=S.users.filter(u=>u.role!=='admin').length;
+  document.getElementById('uu-t').textContent=S.users.length;
+  document.getElementById('uu-a').textContent=a;
+  document.getElementById('uu-v').textContent=v;
+  document.getElementById('users-list').innerHTML=S.users.map(u=>{
+    const isMe = u.id===S.currentUser?.id;
+    const permBadges = u.role==='admin' ? '<span style="font-size:9px;color:var(--gold)">Acceso total</span>'
+      : (u.perms ? Object.entries(u.perms).filter(([,v])=>v).map(([k])=>`<span style="font-size:9px;padding:1px 5px;border-radius:4px;background:var(--teal-bg);border:1px solid rgba(0,212,170,.2);color:var(--teal)">${PERM_LABELS[k]||k}</span>`).join(' ') : '<span style="font-size:9px;color:var(--text-dim)">Visualizador</span>');
+    const avHtml = u.avatar
+      ? `<div class="u-av-circle ${u.role}" onclick="openEditUser('${u.id}')"><img src="${u.avatar}"></div>`
+      : `<div class="u-av-circle ${u.role}" onclick="openEditUser('${u.id}')">${u.username[0].toUpperCase()}</div>`;
+    return `<div class="user-card">
+      ${avHtml}
+      <div class="u-info">
+        <div class="u-name">${u.displayName||u.username}${isMe?' <span style="font-size:9px;color:var(--teal)">(tú)</span>':''}</div>
+        <div class="u-role ${u.role}">${u.role==='admin'?'Administrador':'Personalizado'}</div>
+        ${u.email?`<div style="font-size:10px;color:var(--text-dim);font-family:'Share Tech Mono',monospace">${u.email}</div>`:''}
+        <div style="margin-top:4px;display:flex;flex-wrap:wrap;gap:3px">${permBadges}</div>
+      </div>
+      <span class="badge ${u.role}">${u.role==='admin'?'ADMIN':'USER'}</span>
+      <div style="display:flex;gap:5px;flex-shrink:0">
+        ${!isMe?`<button class="btn btn-g" style="font-size:10px;padding:5px 9px" onclick="openEditUser('${u.id}')">✏️ Editar</button>`:''}
+        ${u.id!=='u1'&&!isMe?`<button class="btn btn-r" style="font-size:10px;padding:5px 9px" onclick="delUser('${u.id}')">🗑</button>`:''}
+      </div>
+    </div>`;
+  }).join('');
+  // Update nav avatar for current user
+  updateNavAvatar();
+}
+
+function openUserM(){
+  document.getElementById('m-user-title').textContent='NUEVO USUARIO';
+  document.getElementById('nu-id').value='';
+  document.getElementById('nu-u').value='';
+  document.getElementById('nu-p').value='';
+  document.getElementById('nu-r').value='viewer';
+  document.getElementById('nu-avatar-data').value='';
+  document.getElementById('nu-avatar-preview').innerHTML='<span id="nu-avatar-letter">A</span>';
+  document.getElementById('nu-avatar-preview').style.background='linear-gradient(135deg,var(--teal),var(--teal-dim))';
+  togglePermUI();
+  setPermsToForm({docs:true,email:false,calendar:false,contacts:false,photos:false,chat:true,notes:true});
+  document.querySelector('#m-user .btn-confirm').textContent='CREAR';
+  openM('m-user');
+}
+
+function openEditUser(id){
+  const u = S.users.find(x=>x.id===id);
+  if(!u) return;
+  document.getElementById('m-user-title').textContent='EDITAR USUARIO';
+  document.getElementById('nu-id').value=u.id;
+  document.getElementById('nu-u').value=u.username;
+  document.getElementById('nu-p').value='';
+  document.getElementById('nu-r').value=u.role==='admin'?'admin':'viewer';
+  // Avatar
+  document.getElementById('nu-avatar-data').value=u.avatar||'';
+  const prev = document.getElementById('nu-avatar-preview');
+  if(u.avatar){
+    prev.innerHTML=`<img src="${u.avatar}" style="width:100%;height:100%;object-fit:cover;border-radius:50%">`;
+  } else {
+    prev.innerHTML=`<span id="nu-avatar-letter">${u.username[0].toUpperCase()}</span>`;
+    prev.style.background=u.role==='admin'?'linear-gradient(135deg,var(--gold),#c4841c)':'linear-gradient(135deg,var(--teal),var(--teal-dim))';
+  }
+  togglePermUI();
+  setPermsToForm(u.perms||null);
+  document.querySelector('#m-user .btn-confirm').textContent='GUARDAR';
+  openM('m-user');
+}
+
+async function saveUser(){
+  const u=document.getElementById('nu-u').value.trim();
+  const p=document.getElementById('nu-p').value;
+  const r=document.getElementById('nu-r').value;
+  const editId=document.getElementById('nu-id').value;
+  const avatar=document.getElementById('nu-avatar-data').value||'';
+  if(!u) return toast('Escribe un nombre de usuario','err');
+  if(!editId && !p) return toast('Ingresa una contraseña','err');
+  if(S.users.find(x=>x.username===u && x.id!==editId)) return toast('Usuario ya existe','err');
+  const perms = r==='admin' ? null : getPermsFromForm();
+  if(editId){
+    const user=S.users.find(x=>x.id===editId);
+    if(!user) return;
+    user.username=u;
+    if(p) user.password=p;
+    user.role=r==='admin'?'admin':'viewer';
+    user.perms=perms;
+    if(avatar) user.avatar=avatar; else if(!avatar && user.avatar) delete user.avatar;
+  } else {
+    const newUser={id:'u'+Date.now(),username:u,password:p,role:r==='admin'?'admin':'viewer',perms};
+    if(avatar) newUser.avatar=avatar;
+    S.users.push(newUser);
+  }
+  await svU();
+  closeM('m-user');
+  renderUsers();
+  toast(editId?'Usuario actualizado ✓':'Usuario creado ✓');
+}
+
 async function delUser(id){if(!confirm('¿Eliminar usuario?'))return;S.users=S.users.filter(u=>u.id!==id);await svU();renderUsers();toast('Usuario eliminado');}
+
+// ── Funciones de Avatar ────────────────────────────
+function previewAvatar(event){
+  const file = event.target.files[0];
+  if(!file) return;
+  if(file.size > 2*1024*1024){ toast('Imagen muy grande (máx 2MB)','err'); return; }
+  const reader = new FileReader();
+  reader.onload = e => {
+    const dataUrl = e.target.result;
+    // Redimensionar a 200x200 para no sobrecargar el storage
+    const img = new Image();
+    img.onload = () => {
+      const canvas = document.createElement('canvas');
+      const size = 200;
+      canvas.width = size; canvas.height = size;
+      const ctx = canvas.getContext('2d');
+      // Recortar cuadrado centrado
+      const min = Math.min(img.width, img.height);
+      const sx = (img.width-min)/2, sy = (img.height-min)/2;
+      ctx.drawImage(img, sx, sy, min, min, 0, 0, size, size);
+      const compressed = canvas.toDataURL('image/jpeg', 0.82);
+      document.getElementById('nu-avatar-data').value = compressed;
+      const prev = document.getElementById('nu-avatar-preview');
+      prev.innerHTML = `<img src="${compressed}" style="width:100%;height:100%;object-fit:cover;border-radius:50%">`;
+    };
+    img.src = dataUrl;
+  };
+  reader.readAsDataURL(file);
+}
+
+function updateNavAvatar(){
+  const user = S.currentUser;
+  if(!user) return;
+  const btn = document.getElementById('nav-av');
+  if(!btn) return;
+  if(user.avatar){
+    btn.innerHTML = `<img src="${user.avatar}" style="width:100%;height:100%;object-fit:cover;border-radius:50%">`;
+  } else {
+    btn.textContent = user.username[0].toUpperCase();
+    btn.style.background = user.role==='admin' ? 'linear-gradient(135deg,var(--gold),#c4841c)' : 'linear-gradient(135deg,var(--teal),var(--teal-dim))';
+  }
+  // Tambien perfil popup
+  const ppAv = document.getElementById('pp-av');
+  if(ppAv){
+    if(user.avatar) ppAv.innerHTML=`<img src="${user.avatar}" style="width:100%;height:100%;object-fit:cover;border-radius:50%">`;
+    else ppAv.textContent=user.username[0].toUpperCase();
+  }
+  // Chat my avatar
+  const myAv = document.getElementById('chat-my-av');
+  if(myAv){
+    if(user.avatar) myAv.innerHTML=`<img src="${user.avatar}" style="width:100%;height:100%;object-fit:cover;border-radius:50%">`;
+    else myAv.textContent=user.username[0].toUpperCase();
+  }
+}
 
 // ══ STATS ══════════════════════════════════════════
 function updateStats(){document.getElementById('st-f').textContent=S.folders.length;document.getElementById('st-d').textContent=S.docs.length;document.getElementById('st-s').textContent=fSz(S.docs.reduce((s,d)=>s+(d.size||0),0));}
@@ -1239,54 +1759,64 @@ const GOOGLE_SCOPES = [
   'https://www.googleapis.com/auth/drive.file'
 ].join(' ');
 
-let googleTokenClient = null;
 let googleAccessToken = null;
-let dvFolderId = null;      // ID carpeta DocVault en Drive
-let photosFolderId = null;  // ID carpeta Fotos en Drive
+let googleTokenClient = null;
+let dvFolderId = null;
+let photosFolderId = null;
 
 function initGoogleAuth(){
-  if(!window.google){ setTimeout(initGoogleAuth,600); return; }
+  if(!window.google?.accounts?.oauth2){ setTimeout(initGoogleAuth, 500); return; }
   googleTokenClient = google.accounts.oauth2.initTokenClient({
     client_id: GOOGLE_CLIENT_ID,
     scope: GOOGLE_SCOPES,
     callback: onGoogleToken,
   });
-  const btnDiv = document.getElementById('g-signin-btn');
-  if(btnDiv){
-    google.accounts.id.initialize({
-      client_id: GOOGLE_CLIENT_ID,
-      callback: onGoogleIdToken,
-    });
-    google.accounts.id.renderButton(btnDiv,{
-      theme:'filled_blue', size:'large', text:'signin_with',
-      shape:'rectangular', width:280,
-    });
-  }
 }
 
-function onGoogleIdToken(response){
-  try{
-    const p = JSON.parse(atob(response.credential.split('.')[1]));
-    S.googleEmail = p.email||'';
-    S.googleName  = p.name||p.email.split('@')[0];
-    googleTokenClient.requestAccessToken({prompt:''});
-  }catch(e){ toast('Error Google','err'); }
+function triggerGoogleOAuth(){
+  if(!window.google?.accounts?.oauth2){
+    toast('⏳ Google aún cargando, intenta de nuevo en un momento...','warn');
+    setTimeout(()=>triggerGoogleOAuth(), 1200);
+    return;
+  }
+  if(!googleTokenClient) initGoogleAuth();
+  setTimeout(()=>{
+    googleTokenClient.requestAccessToken({ prompt:'select_account' });
+  }, 150);
 }
 
 async function onGoogleToken(r){
-  if(r.error){ toast('Error: '+r.error,'err'); return; }
+  if(r.error){
+    toast('❌ Error Google: '+(r.error_description||r.error),'err');
+    return;
+  }
   googleAccessToken = r.access_token;
-  // Crear carpetas en Drive si no existen
-  await ensureDriveFolders();
-  // UI conectado
-  document.getElementById('set-google-form').style.display='none';
-  document.getElementById('set-google-connected').style.display='block';
-  document.getElementById('gc-av').textContent  = S.googleEmail[0].toUpperCase();
-  document.getElementById('gc-name').textContent = S.googleName;
-  document.getElementById('gc-email').textContent = S.googleEmail;
+  try{
+    const info = await fetch('https://www.googleapis.com/oauth2/v3/userinfo',{
+      headers:{ Authorization:'Bearer '+googleAccessToken }
+    }).then(res=>res.json());
+    S.googleEmail = info.email||'';
+    S.googleName  = info.name||info.given_name||S.googleEmail.split('@')[0];
+    if(info.picture && S.currentUser){
+      S.currentUser.avatar = info.picture;
+      await svU().catch(()=>{});
+    }
+  }catch(e){ console.error('Profile error:', e); }
+
+  await ensureDriveFolders().catch(()=>{});
+
+  // Actualizar UI Settings
+  const gForm = document.getElementById('set-google-form');
+  const gConn = document.getElementById('set-google-connected');
+  if(gForm) gForm.style.display='none';
+  if(gConn) gConn.style.display='block';
+  document.querySelectorAll('#gc-av').forEach(el=>el.textContent=S.googleEmail?S.googleEmail[0].toUpperCase():'G');
+  document.querySelectorAll('#gc-name').forEach(el=>el.textContent=S.googleName||'—');
+  document.querySelectorAll('#gc-email').forEach(el=>el.textContent=S.googleEmail||'—');
+  updateNavGoogleLabel(true);
   updateProfileUI();
   setSyncAll('ok');
-  toast('✅ Google Drive conectado: '+S.googleEmail);
+  toast('✅ Google conectado: '+S.googleEmail);
 }
 
 function desconectarGoogle(){
@@ -1406,14 +1936,509 @@ async function loadPhotos(){
 // Sobreescribir openUploadM para guardar en Drive si esta conectado
 const _origOpenUploadM = typeof openUploadM !== 'undefined' ? openUploadM : null;
 
-window.addEventListener('load', ()=>{ setTimeout(initGoogleAuth,800); });
+// load handled below
 
 // ══ INIT ═══════════════════════════════════════════
 (async function(){
-  if(window.storage)await loadSt();
-  else{S.users=[{id:'u1',username:'admin',password:'admin123',role:'admin'}];S.folders=[{id:'f1',name:'Personal',icon:'🏠',access:'all'},{id:'f2',name:'Finanzas',icon:'💰',access:'admin'}];window.storage={get:async()=>null,set:async()=>null,delete:async()=>null,list:async()=>null};}
-  const n=new Date();n.setHours(n.getHours()+1,0,0,0);const e=new Date(n);e.setHours(e.getHours()+1);document.getElementById('ev-start').value=toLocal(n);document.getElementById('ev-end').value=toLocal(e);
+  // Ocultar login mientras carga
+  const authScreen = document.getElementById('google-auth-screen');
+  if(authScreen) authScreen.style.opacity = '0';
+
+  try{
+    if(window.storage){ await loadSt(); }
+    else{
+      S.users=[{id:'u1',username:'admin',password:'admin123',role:'admin'}];
+      S.folders=[{id:'f1',name:'Personal',icon:'🏠',access:'all'},{id:'f2',name:'Finanzas',icon:'💰',access:'admin'}];
+      // Mock storage para que no explote
+      window.storage={get:async()=>null,set:async()=>null,delete:async()=>null,list:async()=>null};
+    }
+  }catch(err){
+    console.error('Error cargando datos:', err);
+    // Fallback: usuario admin por defecto
+    if(!S.users.length) S.users=[{id:'u1',username:'admin',password:'admin123',role:'admin'}];
+  }
+
+  // Siempre garantizar que exista el admin
+  if(!S.users.find(u=>u.id==='u1')){
+    S.users.unshift({id:'u1',username:'admin',password:'admin123',role:'admin'});
+    try{ await svU(); }catch(e){}
+  }
+
+  const n=new Date();n.setHours(n.getHours()+1,0,0,0);const e=new Date(n);e.setHours(e.getHours()+1);
+  const evStart=document.getElementById('ev-start');const evEnd=document.getElementById('ev-end');
+  if(evStart)evStart.value=toLocal(n);if(evEnd)evEnd.value=toLocal(e);
+
+  // Mostrar login ya con datos listos
+  if(authScreen){ authScreen.style.opacity=''; authScreen.style.transition='opacity .3s'; }
 })();
+
+window.addEventListener('load', ()=>{ setTimeout(initGoogleAuth, 800); setTimeout(initChatEngine, 1500); });
+
+// ══ PATCH switchMod para chat ══
+const _swOrig = switchMod;
+window.switchMod = function switchMod(m){
+  _swOrig(m);
+  if(m === 'chat'){
+    document.getElementById('chat-badge').style.display = 'none';
+    chatUnread = 0;
+    if(chatCfg.url && chatCfg.name){ loadChatRoom(chatRoom); }
+    else { openChatSetup(); }
+  }
+};
+
+// ══════════════════════════════
+// CHAT ENGINE (Firebase REST)
+// ══════════════════════════════
+let chatCfg = { url:'', name:'' };
+let chatRoom = 'family';
+let chatLastTs = 0;
+let chatPoll = null;
+let chatUnread = 0;
+
+async function initChatEngine(){
+  try{
+    const r = await window.storage.get('dvchat-cfg');
+    if(r && r.value){ chatCfg = JSON.parse(r.value); }
+  }catch{}
+}
+
+function openChatSetup(){
+  const el = document.getElementById('chat-setup');
+  el.style.display = 'block';
+  document.getElementById('chat-empty-state').style.display = 'none';
+  if(chatCfg.url) document.getElementById('fb-url').value = chatCfg.url;
+  // Pre-fill name from logged-in user
+  const name = chatCfg.name || S.currentUser?.username || '';
+  document.getElementById('chat-myname').value = name;
+}
+
+async function saveChatSetup(){
+  const url = (document.getElementById('fb-url').value||'').trim().replace(/\/$/,'');
+  const name = (document.getElementById('chat-myname').value||'').trim();
+  if(!url || !name){ toast('Completa la URL y tu nombre','warn'); return; }
+  chatCfg = { url, name };
+  try{ await window.storage.set('dvchat-cfg', JSON.stringify(chatCfg)); }catch{}
+  document.getElementById('chat-setup').style.display = 'none';
+  toast('✅ Chat configurado');
+  chatLastTs = 0;
+  startChatPoll();
+  loadChatRoom(chatRoom);
+}
+
+// Firebase REST
+async function fbPush(path, data){
+  const res = await fetch(`${chatCfg.url}/${path}.json`,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(data)});
+  return res.json();
+}
+async function fbGet(path, qs=''){
+  const res = await fetch(`${chatCfg.url}/${path}.json${qs}`);
+  return res.json();
+}
+async function fbSet(path, data){
+  await fetch(`${chatCfg.url}/${path}.json`,{method:'PUT',headers:{'Content-Type':'application/json'},body:JSON.stringify(data)});
+}
+
+function startChatPoll(){
+  if(chatPoll) clearInterval(chatPoll);
+  chatPoll = setInterval(chatTick, 3500);
+  chatTick();
+}
+
+async function chatTick(){
+  if(!chatCfg.url || !chatCfg.name) return;
+  // Presence heartbeat
+  try{
+    const key = chatCfg.name.replace(/[.#$\[\]/]/g,'_');
+    await fbSet(`presence/${key}`,{name:chatCfg.name, ts:Date.now(), online:true});
+  }catch{}
+  // Check partner presence
+  try{
+    const pres = await fbGet('presence');
+    if(pres){
+      const now = Date.now();
+      const others = Object.values(pres).filter(p=>p.name!==chatCfg.name && (now-p.ts)<90000);
+      const dot = document.getElementById('chat-partner-dot');
+      const lbl = document.getElementById('chat-partner-lbl');
+      if(others.length){
+        dot.className='dot-on'; lbl.textContent=others[0].name+' en línea';
+      } else {
+        dot.className='dot-off'; lbl.textContent='Sin conexión';
+      }
+    }
+  }catch{}
+  // Poll new messages
+  try{
+    const qs = chatLastTs>0 ? `?orderBy="ts"&startAt=${chatLastTs+1}&limitToLast=20` : `?orderBy="ts"&limitToLast=5`;
+    const data = await fbGet(`chat/${chatRoom}`, qs);
+    if(!data) return;
+    const msgs = Object.values(data).sort((a,b)=>a.ts-b.ts).filter(m=>m.ts>chatLastTs);
+    if(!msgs.length) return;
+    const box = document.getElementById('chat-msgs');
+    const atBottom = box.scrollHeight - box.scrollTop - box.clientHeight < 60;
+    const lastEl = box.querySelector('.chat-msg:last-child');
+    let lastMsg = lastEl ? {name: lastEl.classList.contains('mine')?chatCfg.name:'_other_', ts: chatLastTs} : null;
+    msgs.forEach(m=>{
+      box.appendChild(buildChatBubble(m, lastMsg));
+      lastMsg = m;
+      if(m.ts > chatLastTs) chatLastTs = m.ts;
+      // Badge if tab not active
+      if(!document.getElementById('mod-chat').classList.contains('active') && m.name !== chatCfg.name){
+        chatUnread++;
+        const b = document.getElementById('chat-badge');
+        b.textContent = chatUnread > 9 ? '9+' : chatUnread;
+        b.style.display = 'block';
+      }
+    });
+    if(atBottom) box.scrollTop = box.scrollHeight;
+    // update room preview
+    const last = msgs[msgs.length-1];
+    updateRoomPreview(chatRoom, last);
+  }catch(e){}
+}
+
+function buildChatBubble(msg, prevMsg){
+  const mine = msg.name === chatCfg.name;
+  const div = document.createElement('div');
+  const consecutive = prevMsg && prevMsg.name === msg.name && (msg.ts - prevMsg.ts) < 120000;
+  div.className = 'chat-msg ' + (mine ? 'mine' : 'theirs') + (consecutive ? ' consecutive' : '');
+
+  const time = new Date(msg.ts).toLocaleTimeString('es-ES',{hour:'2-digit',minute:'2-digit'});
+
+  // Avatar del remitente (solo para "theirs" y no consecutivo)
+  const avatarHtml = (!mine && !consecutive) ? `<div class="cm-avatar">${getChatAvatar(msg.name)}</div>` : (!mine ? '<div style="width:28px;flex-shrink:0"></div>' : '');
+
+  // Nombre del remitente (solo primera burbuja del grupo)
+  const senderHtml = (!mine && !consecutive) ? `<div class="cm-sender">${escChatHtml(msg.name)}</div>` : '';
+
+  // Ticks de lectura (solo mis mensajes)
+  const tickHtml = mine ? `<svg class="cm-tick" viewBox="0 0 16 11" fill="none" xmlns="http://www.w3.org/2000/svg" style="opacity:.7"><path d="M11.071.653L4.337 7.387 1.854 4.904.5 6.258l3.837 3.837L12.425 2.007 11.071.653zm2.828 0l-6.734 6.734-1-1L4.82 7.732l2.346 2.346L15.253 2.007 13.899.653z" fill="#53bdeb"/></svg>` : '';
+
+  div.innerHTML = `${avatarHtml}<div style="display:flex;flex-direction:column;max-width:100%">
+    ${senderHtml}
+    <div class="cm-bub">${escChatHtml(msg.text)}<span class="cm-time">${time}${tickHtml}</span></div>
+  </div>`;
+  return div;
+}
+
+function getChatAvatar(name){
+  // Buscar foto de usuario si existe
+  const user = S.users?.find(u=>u.username===name);
+  if(user?.avatar) return `<img src="${user.avatar}" style="width:100%;height:100%;object-fit:cover;border-radius:50%">`;
+  return `<span style="font-size:12px;font-weight:700;color:#fff">${(name||'?')[0].toUpperCase()}</span>`;
+}
+
+function escChatHtml(s){ return (s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/\n/g,'<br>'); }
+
+function updateRoomPreview(room, msg){
+  const el = document.getElementById('crl-'+room);
+  if(el) el.textContent = (msg.name===chatCfg.name?'Tú: ':msg.name+': ') + (msg.text||'').substring(0,30);
+  // Show time
+  const ri = document.getElementById('cr-'+room);
+  if(ri){
+    let timeEl = ri.querySelector('.cr-time');
+    if(!timeEl){ timeEl=document.createElement('div'); timeEl.className='cr-time'; ri.appendChild(timeEl); }
+    timeEl.textContent = new Date(msg.ts).toLocaleTimeString('es-ES',{hour:'2-digit',minute:'2-digit'});
+  }
+}
+
+async function loadChatRoom(room){
+  if(!chatCfg.url || !chatCfg.name) return;
+  chatLastTs = 0;
+  const box = document.getElementById('chat-msgs');
+  box.innerHTML = '<div class="chat-datesep">Cargando mensajes...</div>';
+  document.getElementById('chat-empty-state').style.display = 'none';
+  try{
+    const data = await fbGet(`chat/${room}`, '?orderBy="ts"&limitToLast=60');
+    box.innerHTML = '';
+    if(!data){ box.innerHTML='<div class="chat-datesep">Sin mensajes aún. ¡Di hola! 👋</div>'; startChatPoll(); return; }
+    const msgs = Object.values(data).sort((a,b)=>a.ts-b.ts);
+    let lastDate = '';
+    msgs.forEach((m, i)=>{
+      const d = new Date(m.ts).toLocaleDateString('es-ES',{weekday:'short',day:'numeric',month:'short'});
+      if(d!==lastDate){ lastDate=d; const sep=document.createElement('div'); sep.className='chat-datesep'; sep.textContent=d; box.appendChild(sep); }
+      box.appendChild(buildChatBubble(m, i>0?msgs[i-1]:null));
+      if(m.ts>chatLastTs) chatLastTs=m.ts;
+    });
+    box.scrollTop = box.scrollHeight;
+    if(msgs.length) updateRoomPreview(room, msgs[msgs.length-1]);
+    startChatPoll();
+  }catch(e){ box.innerHTML='<div class="chat-datesep" style="color:var(--red)">Error al cargar. Verifica la URL de Firebase.</div>'; }
+}
+
+function selectChatRoom(room, title, icon){
+  chatRoom = room;
+  chatLastTs = 0;
+  document.querySelectorAll('.chat-room-item').forEach(el=>el.classList.remove('active'));
+  document.getElementById('cr-'+room).classList.add('active');
+  document.getElementById('chat-room-title').textContent = title.toUpperCase();
+  const av = document.getElementById('chat-room-av');
+  if(av) av.textContent = icon||'💬';
+  if(chatCfg.url && chatCfg.name) loadChatRoom(room);
+}
+
+async function sendChat(){
+  if(!chatCfg.url||!chatCfg.name){ toast('Configura el chat primero','warn'); openChatSetup(); return; }
+  const inp = document.getElementById('chat-inp');
+  const text = inp.value.trim();
+  if(!text) return;
+  const btn = document.getElementById('chat-send-btn');
+  btn.disabled = true; inp.value = ''; inp.style.height='auto';
+  try{
+    await fbPush(`chat/${chatRoom}`, {name:chatCfg.name, text, ts:Date.now()});
+    setTimeout(()=>chatTick(), 300);
+  }catch(e){ toast('Error al enviar','err'); inp.value=text; }
+  btn.disabled = false; inp.focus();
+}
+
+// ══════════════════════════════════════════════════
+// SISTEMA DE NOTAS INTERNAS
+// ══════════════════════════════════════════════════
+// Notas se guardan en storage: 'dv-notes' = array de {id,from,to,subject,body,urgent,ts,readBy:[]}
+// readBy: array de usernames que ya leyeron la nota
+
+let notesFilter = 'inbox';
+
+async function loadNotes(){
+  try{
+    const r = await window.storage.get('dv-notes');
+    return r && r.value ? JSON.parse(r.value) : [];
+  }catch{ return []; }
+}
+
+async function saveNotes(notes){
+  try{ await window.storage.set('dv-notes', JSON.stringify(notes)); }catch{}
+}
+
+function openNewNote(){
+  // Populate recipients: all users except current
+  const sel = document.getElementById('nn-to');
+  const others = S.users.filter(u => u.username !== S.currentUser?.username);
+  if(!others.length){ toast('No hay otros usuarios para enviar notas','warn'); return; }
+  sel.innerHTML = others.map(u=>`<option value="${u.username}">${u.username} (${u.role==='admin'?'Admin':'Usuario'})</option>`).join('');
+  document.getElementById('nn-subject').value='';
+  document.getElementById('nn-body').value='';
+  document.getElementById('nn-urgent').checked=false;
+  openM('m-note-new');
+}
+
+async function sendNote(){
+  const to = document.getElementById('nn-to').value;
+  const subject = document.getElementById('nn-subject').value.trim();
+  const body = document.getElementById('nn-body').value.trim();
+  const urgent = document.getElementById('nn-urgent').checked;
+  if(!subject || !body){ toast('Completa asunto y mensaje','err'); return; }
+  const notes = await loadNotes();
+  notes.unshift({
+    id:'n'+Date.now(),
+    from: S.currentUser.username,
+    to,
+    subject,
+    body,
+    urgent,
+    ts: Date.now(),
+    readBy: [S.currentUser.username] // sender already "read" it
+  });
+  await saveNotes(notes);
+  closeM('m-note-new');
+  renderNotesModule();
+  toast(`📝 Nota enviada a ${to} ✓`);
+}
+
+async function renderNotesModule(){
+  const me = S.currentUser?.username;
+  const notes = await loadNotes();
+  let filtered;
+  if(notesFilter === 'inbox'){
+    filtered = notes.filter(n => n.to === me);
+  } else if(notesFilter === 'sent'){
+    filtered = notes.filter(n => n.from === me);
+  } else {
+    filtered = notes.filter(n => n.to === me || n.from === me);
+  }
+
+  const unread = notes.filter(n=>n.to===me && !n.readBy?.includes(me)).length;
+  const totalIn = notes.filter(n=>n.to===me).length;
+  const totalOut = notes.filter(n=>n.from===me).length;
+
+  // Stats
+  const u = document.getElementById('ns-unread');
+  const t = document.getElementById('ns-total');
+  const s = document.getElementById('ns-sent');
+  if(u) u.textContent = unread;
+  if(t) t.textContent = totalIn;
+  if(s) s.textContent = totalOut;
+
+  // Badge on nav
+  updateNotesBadge(unread);
+
+  const area = document.getElementById('notes-area');
+  if(!area) return;
+  if(!filtered.length){
+    area.innerHTML = '<div class="empty-state" style="grid-column:1/-1"><div class="e-ico">📝</div><p>No hay notas aún</p></div>';
+    return;
+  }
+
+  area.innerHTML = filtered.map(n => {
+    const isUnread = n.to === me && !n.readBy?.includes(me);
+    const time = new Date(n.ts).toLocaleDateString('es-ES',{day:'numeric',month:'short',hour:'2-digit',minute:'2-digit'});
+    const isMine = n.from === me;
+    return `<div class="note-card ${isUnread?'unread':''}" onclick="viewNote('${n.id}')">
+      <div class="note-meta">
+        <span class="note-from">${isMine ? '→ Para: '+n.to : '← De: '+n.from}</span>
+        ${n.urgent ? '<span style="color:var(--red);font-size:9px;font-weight:700">⚠️ URGENTE</span>' : ''}
+        <span style="margin-left:auto">${time}</span>
+      </div>
+      <div class="note-subject">${escH(n.subject)}</div>
+      <div class="note-preview">${escH(n.body)}</div>
+      <div class="note-acts">
+        ${!isMine && isUnread ? `<span style="font-size:9px;padding:2px 7px;border-radius:3px;background:rgba(245,166,35,.15);border:1px solid rgba(245,166,35,.3);color:var(--gold);font-weight:700">SIN LEER</span>` : ''}
+        ${isMine ? `<button class="btn btn-r" style="font-size:9px;padding:3px 8px;margin-left:auto" onclick="deleteNote(event,'${n.id}')">🗑</button>` : ''}
+      </div>
+    </div>`;
+  }).join('');
+}
+
+async function viewNote(id){
+  const notes = await loadNotes();
+  const note = notes.find(n=>n.id===id);
+  if(!note) return;
+  const me = S.currentUser?.username;
+
+  // Mark as read
+  if(note.to === me && !note.readBy?.includes(me)){
+    if(!note.readBy) note.readBy=[];
+    note.readBy.push(me);
+    await saveNotes(notes);
+    renderNotesModule();
+  }
+
+  // Populate viewer
+  const time = new Date(note.ts).toLocaleString('es-ES',{day:'numeric',month:'long',year:'numeric',hour:'2-digit',minute:'2-digit'});
+  document.getElementById('nv-meta').innerHTML = `
+    <span><b>De:</b> ${escH(note.from)}</span>
+    <span><b>Para:</b> ${escH(note.to)}</span>
+    <span><b>Fecha:</b> ${time}</span>
+    ${note.urgent ? '<span style="color:var(--red);font-weight:700">⚠️ URGENTE</span>' : ''}
+  `;
+  document.getElementById('nv-subject').textContent = note.subject;
+  document.getElementById('nv-body').textContent = note.body;
+
+  // Action buttons
+  const acts = document.getElementById('nv-actions');
+  if(note.to === me){
+    acts.innerHTML = `<button class="btn btn-t" onclick="closeM('m-note-view');replyNote('${note.id}')">↩️ Responder</button>
+    <button class="btn btn-r" style="margin-left:auto" onclick="deleteNote(null,'${note.id}');closeM('m-note-view')">🗑 Eliminar</button>`;
+  } else {
+    acts.innerHTML = `<button class="btn btn-r" style="margin-left:auto" onclick="deleteNote(null,'${note.id}');closeM('m-note-view')">🗑 Eliminar</button>`;
+  }
+
+  openM('m-note-view');
+}
+
+async function replyNote(id){
+  const notes = await loadNotes();
+  const orig = notes.find(n=>n.id===id);
+  if(!orig) return;
+  const sel = document.getElementById('nn-to');
+  const recipient = orig.from;
+  const others = S.users.filter(u=>u.username !== S.currentUser?.username);
+  sel.innerHTML = others.map(u=>`<option value="${u.username}" ${u.username===recipient?'selected':''}>${u.username}</option>`).join('');
+  document.getElementById('nn-subject').value = 'Re: '+orig.subject;
+  document.getElementById('nn-body').value = '';
+  document.getElementById('nn-urgent').checked = false;
+  openM('m-note-new');
+}
+
+async function deleteNote(e, id){
+  if(e) e.stopPropagation();
+  if(!confirm('¿Eliminar esta nota?')) return;
+  const notes = await loadNotes();
+  await saveNotes(notes.filter(n=>n.id!==id));
+  renderNotesModule();
+  toast('Nota eliminada');
+}
+
+function filterNotes(f){
+  notesFilter = f;
+  ['all','inbox','sent'].forEach(k=>{
+    const btn = document.getElementById('nf-'+k);
+    if(btn) btn.className = 'btn ' + (k===f ? 'btn-t' : 'btn-ghost');
+    if(btn) btn.style.fontSize='10px'; btn && (btn.style.padding='4px 10px');
+  });
+  renderNotesModule();
+}
+
+function updateNotesBadge(count){
+  const b = document.getElementById('notes-badge');
+  if(!b) return;
+  if(count > 0){
+    b.textContent = count > 9 ? '9+' : count;
+    b.style.display = 'block';
+  } else {
+    b.style.display = 'none';
+  }
+}
+
+// ── Inbox Popup al login ──────────────────────────
+async function showInboxPopup(){
+  const me = S.currentUser?.username;
+  if(!me) return;
+  const notes = await loadNotes();
+  const unreadNotes = notes.filter(n=>n.to===me && !n.readBy?.includes(me));
+
+  // Also count chat unread via chatCfg if configured
+  const items = [];
+
+  unreadNotes.forEach(n=>{
+    items.push({
+      type:'note',
+      icon:'📝',
+      from: n.from,
+      subject: n.subject,
+      preview: (n.body||'').substring(0,80),
+      time: new Date(n.ts).toLocaleString('es-ES',{day:'numeric',month:'short',hour:'2-digit',minute:'2-digit'}),
+      urgent: n.urgent,
+      id: n.id
+    });
+  });
+
+  if(!items.length) return; // nothing to show
+
+  const container = document.getElementById('inbox-items');
+  container.innerHTML = items.map(item=>`
+    <div class="inbox-item ${item.type}-type" onclick="handleInboxClick('${item.type}','${item.id||''}')">
+      <div class="ii-type">${item.icon} ${item.type==='note'?'NOTA NUEVA':'CHAT'}</div>
+      <div class="ii-from">${escH(item.from)} ${item.urgent?'<span style="color:var(--red)">⚠️ URGENTE</span>':''}</div>
+      <div class="ii-subj">${escH(item.subject)}</div>
+      <div class="ii-preview">${escH(item.preview)}${(item.preview||'').length>=80?'...':''}</div>
+      <div class="ii-time">${item.time}</div>
+    </div>
+  `).join('');
+
+  document.getElementById('inbox-popup').classList.add('open');
+  updateNotesBadge(unreadNotes.length);
+}
+
+function closeInboxPopup(){
+  document.getElementById('inbox-popup').classList.remove('open');
+}
+
+async function handleInboxClick(type, id){
+  closeInboxPopup();
+  if(type === 'note'){
+    switchMod('notes');
+    setTimeout(()=>viewNote(id), 200);
+  }
+}
+
+// ── Patch switchMod for notes ──────────────────────
+const _swNotes = window.switchMod;
+window.switchMod = function(m){
+  _swNotes(m);
+  if(m==='notes'){
+    filterNotes(notesFilter);
+  }
+};
 </script>
 </body>
 </html>
