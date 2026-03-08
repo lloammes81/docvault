@@ -557,30 +557,23 @@ select option{background:var(--bg3);}
 .nv-subject{font-size:17px;font-weight:700;color:var(--teal);margin-bottom:12px;font-family:'Orbitron',monospace;letter-spacing:1px;}
 .nv-body{font-size:13px;color:var(--text);line-height:1.7;white-space:pre-wrap;background:var(--bg4);border:1px solid var(--border);border-radius:4px;padding:14px 16px;}
 
-.sync-panel{margin-top:14px;padding:14px;border:1px solid var(--border);background:linear-gradient(180deg,var(--bg3),rgba(14,19,25,.92));border-radius:10px;box-shadow:var(--shadow-soft);}
-.sync-head{display:flex;justify-content:space-between;align-items:center;gap:10px;flex-wrap:wrap;margin-bottom:10px;}
-.sync-meta{font-size:10px;color:var(--text-dim);font-family:"Share Tech Mono",monospace;letter-spacing:.4px;}
-.sync-progress-wrap{height:14px;border-radius:999px;background:rgba(255,255,255,.05);border:1px solid rgba(255,255,255,.08);overflow:hidden;position:relative;}
-.sync-progress-bar{height:100%;width:0%;background:linear-gradient(90deg,var(--teal),var(--gold));box-shadow:0 0 18px rgba(0,212,170,.24);transition:width .28s ease;}
-.sync-progress-label{display:flex;justify-content:space-between;align-items:center;margin-top:7px;font-size:10px;color:var(--text-mid);font-family:"Share Tech Mono",monospace;}
-.sync-steps{margin-top:12px;display:grid;gap:8px;}
-.sync-step{display:grid;grid-template-columns:22px 1fr auto;gap:10px;align-items:center;padding:9px 10px;border-radius:8px;background:rgba(255,255,255,.025);border:1px solid rgba(255,255,255,.04);}
-.sync-step-icon{width:22px;height:22px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:11px;background:rgba(255,255,255,.05);border:1px solid rgba(255,255,255,.07);}
-.sync-step-name{font-size:12px;color:var(--text-light);font-weight:700;}
-.sync-step-sub{font-size:10px;color:var(--text-dim);margin-top:2px;}
-.sync-step-status{font-size:10px;font-weight:700;padding:4px 8px;border-radius:999px;border:1px solid rgba(255,255,255,.08);color:var(--text-mid);background:rgba(255,255,255,.03);}
-.sync-step.syncing .sync-step-status{color:var(--teal);border-color:rgba(0,212,170,.25);background:rgba(0,212,170,.08);}
-.sync-step.ok .sync-step-status{color:var(--green);border-color:rgba(30,215,96,.22);background:rgba(30,215,96,.08);}
-.sync-step.err .sync-step-status{color:var(--red);border-color:rgba(255,64,96,.22);background:rgba(255,64,96,.08);}
-.sync-log{margin-top:12px;max-height:170px;overflow:auto;padding:10px;border-radius:8px;background:#0a1118;border:1px solid rgba(255,255,255,.05);font-family:"Share Tech Mono",monospace;font-size:10px;color:#b9c9d8;line-height:1.55;}
-.sync-log-line{margin-bottom:6px;white-space:pre-wrap;}
-.sync-log-line.ok{color:#9ef0b8;}
-.sync-log-line.err{color:#ff8ca4;}
-.sync-log-line.run{color:#71f3da;}
+/* Sync panel */
+.sync-box{margin-top:14px;padding:12px;border:1px solid rgba(255,255,255,.08);border-radius:14px;background:linear-gradient(180deg, rgba(255,255,255,.03), rgba(255,255,255,.015));box-shadow:0 10px 24px rgba(0,0,0,.18)}
+.sync-box-top{display:flex;gap:10px;align-items:center;justify-content:space-between;flex-wrap:wrap}
+.sync-main-status{font-size:11px;color:var(--text-dim);font-family:'Share Tech Mono',monospace}
+.sync-progress-wrap{margin-top:12px}.sync-progress-track{width:100%;height:22px;background:rgba(255,255,255,.06);border:1px solid rgba(255,255,255,.08);border-radius:999px;overflow:hidden}
+.sync-progress-bar{width:0%;height:100%;display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:800;color:#07131a;background:linear-gradient(90deg, var(--teal), var(--gold));transition:width .35s ease}
+.sync-grid{margin-top:12px;display:grid;grid-template-columns:repeat(3,1fr);gap:10px}.sync-item{padding:10px;border-radius:12px;background:rgba(255,255,255,.025);border:1px solid rgba(255,255,255,.06)}.sync-label{font-size:11px;color:var(--text-dim);margin-bottom:7px}
+.sync-mini{display:inline-flex;align-items:center;gap:6px;padding:4px 9px;border-radius:999px;font-size:10px;font-weight:800;letter-spacing:.3px;border:1px solid}
+.sync-mini.idle{color:var(--text-dim);border-color:rgba(78,101,117,.28);background:rgba(78,101,117,.12)}
+.sync-mini.syncing{color:var(--teal);border-color:rgba(0,212,170,.35);background:rgba(0,212,170,.10)}
+.sync-mini.ok{color:var(--green);border-color:rgba(30,215,96,.35);background:rgba(30,215,96,.10)}
+.sync-mini.err{color:var(--red);border-color:rgba(255,64,96,.35);background:rgba(255,64,96,.10)}
+.sync-log{margin-top:12px;max-height:180px;overflow:auto;padding:10px;border-radius:12px;background:#0a1118;border:1px solid rgba(255,255,255,.06);font-size:11px;color:#b8c7d0;font-family:'Share Tech Mono',monospace;line-height:1.5}
+@media (max-width:900px){.sync-grid{grid-template-columns:1fr}}
 
 </style>
-<script src="https://accounts.google.com/gsi/client" async defer>
-</script>
+<script src="https://accounts.google.com/gsi/client" async defer></script>
 </head>
 <body>
 
@@ -821,26 +814,38 @@ select option{background:var(--bg3);}
             <div class="set-row"><div class="sr-l"><div class="sr-title">Google Contacts</div><div class="sr-sub">Búsqueda y selección de contactos</div></div><div style="display:flex;gap:7px;align-items:center"><div id="set-cont" class="sync-pill idle"><div class="sp-dot"></div>Sin sincronizar</div><button class="btn btn-ghost" style="font-size:10px;padding:5px 9px" onclick="testCont()">Probar</button></div></div>
             <div style="margin-top:14px;display:flex;align-items:center;gap:12px;flex-wrap:wrap">
               <button class="btn btn-solid" onclick="testAll()">⚡ Verificar Todas</button>
-              <button class="btn btn-g" onclick="syncAllGoogleData()">🔄 Sincronizar Todo</button>
               <span id="last-sync" style="font-size:10px;color:var(--text-dim);font-family:'Share Tech Mono',monospace"></span>
             </div>
-            <div class="sync-panel">
-              <div class="sync-head">
-                <div>
-                  <div class="sr-title">Sincronización completa</div>
-                  <div class="sr-sub">Carga Gmail, Contactos y Calendar mostrando el avance en vivo.</div>
+            <div class="sync-box">
+              <div class="sync-box-top">
+                <button id="btn-sync-all" class="btn btn-g" onclick="syncAllGoogle()">🔄 Sincronizar todo</button>
+                <div id="sync-main-status" class="sync-main-status">Listo para sincronizar</div>
+              </div>
+
+              <div class="sync-progress-wrap">
+                <div class="sync-progress-track">
+                  <div id="sync-progress-bar" class="sync-progress-bar">0%</div>
                 </div>
-                <div id="sync-summary" class="sync-meta">Esperando sincronización manual</div>
               </div>
-              <div class="sync-progress-wrap"><div id="sync-progress-bar" class="sync-progress-bar"></div></div>
-              <div class="sync-progress-label"><span id="sync-progress-text">0%</span><span id="sync-progress-detail">Listo para iniciar</span></div>
-              <div class="sync-steps" id="sync-steps">
-                <div class="sync-step" id="sync-step-gmail"><div class="sync-step-icon">✉️</div><div><div class="sync-step-name">Gmail</div><div class="sync-step-sub">Correos primarios sin spam</div></div><div class="sync-step-status">Pendiente</div></div>
-                <div class="sync-step" id="sync-step-contacts"><div class="sync-step-icon">👤</div><div><div class="sync-step-name">Contactos</div><div class="sync-step-sub">Directorio de Google Contacts</div></div><div class="sync-step-status">Pendiente</div></div>
-                <div class="sync-step" id="sync-step-calendar"><div class="sync-step-icon">📅</div><div><div class="sync-step-name">Calendario</div><div class="sync-step-sub">Próximos eventos y agenda</div></div><div class="sync-step-status">Pendiente</div></div>
+
+              <div class="sync-grid">
+                <div class="sync-item">
+                  <div class="sync-label">📥 Gmail</div>
+                  <div id="sync-gmail-status" class="sync-mini idle">Pendiente</div>
+                </div>
+                <div class="sync-item">
+                  <div class="sync-label">👥 Contactos</div>
+                  <div id="sync-contacts-status" class="sync-mini idle">Pendiente</div>
+                </div>
+                <div class="sync-item">
+                  <div class="sync-label">📅 Calendario</div>
+                  <div id="sync-calendar-status" class="sync-mini idle">Pendiente</div>
+                </div>
               </div>
-              <div id="sync-log" class="sync-log"><div class="sync-log-line">[listo] panel de sincronización preparado</div></div>
+
+              <div id="sync-log" class="sync-log">Esperando sincronización...</div>
             </div>
+
           </div>
           <!-- Credentials -->
           <div class="settings-block">
@@ -1401,83 +1406,6 @@ async function testAll(){
   toast(ok?'✅ Todas las conexiones OK':'⚠ Algunas conexiones fallaron',ok?'ok':'warn');
 }
 
-const SYNC_STEP_META={gmail:{id:'sync-step-gmail',label:'Gmail'},contacts:{id:'sync-step-contacts',label:'Contactos'},calendar:{id:'sync-step-calendar',label:'Calendario'}};
-let syncRunning=false;
-function syncEl(id){return document.getElementById(id)}
-function resetSyncPanel(){
-  Object.values(SYNC_STEP_META).forEach(({id})=>{
-    const el=syncEl(id); if(!el) return; el.classList.remove('syncing','ok','err');
-    const st=el.querySelector('.sync-step-status'); if(st) st.textContent='Pendiente';
-  });
-  const bar=syncEl('sync-progress-bar'); if(bar) bar.style.width='0%';
-  const txt=syncEl('sync-progress-text'); if(txt) txt.textContent='0%';
-  const det=syncEl('sync-progress-detail'); if(det) det.textContent='Listo para iniciar';
-  const sum=syncEl('sync-summary'); if(sum) sum.textContent='Esperando sincronización manual';
-  const log=syncEl('sync-log'); if(log) log.innerHTML='<div class="sync-log-line">[listo] panel de sincronización preparado</div>';
-}
-function addSyncLog(message,type=''){
-  const log=syncEl('sync-log'); if(!log) return;
-  const line=document.createElement('div');
-  line.className='sync-log-line'+(type?' '+type:'');
-  const stamp=new Date().toLocaleTimeString('es-MX',{hour:'2-digit',minute:'2-digit',second:'2-digit'});
-  line.textContent=`[${stamp}] ${message}`;
-  log.appendChild(line); log.scrollTop=log.scrollHeight;
-}
-function updateSyncProgress(done,total,detail=''){
-  const pct=Math.max(0,Math.min(100,Math.round((done/total)*100)));
-  const bar=syncEl('sync-progress-bar'); if(bar) bar.style.width=pct+'%';
-  const txt=syncEl('sync-progress-text'); if(txt) txt.textContent=pct+'%';
-  const det=syncEl('sync-progress-detail'); if(det) det.textContent=detail || `${done}/${total} completado`;
-  const sum=syncEl('sync-summary'); if(sum) sum.textContent=`${done}/${total} módulos procesados`;
-}
-function setSyncStep(step,state,label){
-  const meta=SYNC_STEP_META[step]; if(!meta) return;
-  const el=syncEl(meta.id); if(!el) return;
-  el.classList.remove('syncing','ok','err'); if(state) el.classList.add(state);
-  const st=el.querySelector('.sync-step-status'); if(st) st.textContent=label || (state==='syncing'?'Sincronizando':state==='ok'?'Completado':state==='err'?'Error':'Pendiente');
-}
-async function syncAllGoogleData(){
-  if(syncRunning){ toast('Ya hay una sincronización en progreso','warn'); return; }
-  syncRunning=true;
-  const total=3; let done=0; let okCount=0;
-  const lbl=syncEl('last-sync');
-  resetSyncPanel();
-  if(lbl) lbl.textContent='Sincronizando...';
-  setPill('gc-status','syncing','Sincronizando...');
-  addSyncLog('Iniciando sincronización completa de Google','run');
-  const steps=[
-    {key:'gmail', start:'Cargando Gmail primario...', ok:'Gmail cargado', err:'Error al cargar Gmail', run:async()=>{await loadInbox(); const count=(document.querySelectorAll('#email-area .email-it')||[]).length; return `${count} correos cargados`; }},
-    {key:'contacts', start:'Cargando Google Contacts...', ok:'Contactos cargados', err:'Error al cargar contactos', run:async()=>{await loadAllContacts(); const count=(document.querySelectorAll('#cont-area .contact-card')||[]).length; return `${count} contactos cargados`; }},
-    {key:'calendar', start:'Cargando Google Calendar...', ok:'Calendario cargado', err:'Error al cargar calendario', run:async()=>{await loadCalEvents(); const count=Array.isArray(S.calEvents)?S.calEvents.length:0; return `${count} eventos cargados`; }}
-  ];
-  try{
-    for(const step of steps){
-      setSyncStep(step.key,'syncing','Sincronizando...');
-      updateSyncProgress(done,total,step.start);
-      addSyncLog(step.start,'run');
-      try{
-        const detail=await step.run();
-        done++; okCount++;
-        setSyncStep(step.key,'ok',detail);
-        updateSyncProgress(done,total,detail);
-        addSyncLog(`${step.ok}: ${detail}`,'ok');
-      }catch(err){
-        done++;
-        const msg=err?.message||'Error desconocido';
-        setSyncStep(step.key,'err','Falló');
-        updateSyncProgress(done,total,`${step.err}: ${msg}`);
-        addSyncLog(`${step.err}: ${msg}`,'err');
-      }
-    }
-    const allOk=okCount===total;
-    setPill('gc-status',allOk?'ok':'err',allOk?'Sincronizado ✓':'Sincronización parcial');
-    if(lbl) lbl.textContent='Última sincronización: '+new Date().toLocaleTimeString('es-MX');
-    const sum=syncEl('sync-summary'); if(sum) sum.textContent=allOk?'Sincronización completada correctamente':'Sincronización completada con incidencias';
-    addSyncLog(allOk?'Proceso finalizado sin errores':'Proceso finalizado con incidencias',allOk?'ok':'err');
-    toast(allOk?'Sincronización completa ✓':'Sincronización parcial',allOk?'ok':'warn');
-  }finally{ syncRunning=false; }
-}
-
 // ══ MODULES ════════════════════════════════════════
 function switchMod(m){
   document.querySelectorAll('.module').forEach(x=>x.classList.remove('active'));
@@ -1562,7 +1490,7 @@ async function sendEmail(){
 
 async function loadInbox(){
   const area=document.getElementById('email-area');area.innerHTML=thinking('Cargando bandeja...');setPill(['gmail-pill','set-gmail'],'syncing','Cargando...');
-  try{const data=await callAI('List 15 most recent primary Gmail inbox emails only. Exclude spam, trash, promotions, social, updates, forums, and drafts. Return ONLY a JSON array: [{from_name,from_email,subject,date,preview,has_attachment}]. No markdown.','Use Gmail tools.',GMAIL);let txt=(getText(data)||getMcp(data)).replace(/```json|```/g,'').trim();let emails=[];try{emails=JSON.parse(txt);}catch{}
+  try{const data=await callAI('List 15 most recent Gmail inbox emails. Return JSON array: [{from_name,from_email,subject,date,preview,has_attachment}]. ONLY JSON, no markdown.','Use Gmail tools.',GMAIL);let txt=(getText(data)||getMcp(data)).replace(/```json|```/g,'').trim();let emails=[];try{emails=JSON.parse(txt);}catch{}
   if(!emails.length){area.innerHTML='<div class="empty-state"><div class="e-ico">📭</div><p>Sin correos</p></div>';setPill(['gmail-pill','set-gmail'],'ok','Gmail ✓');return;}
   setPill(['gmail-pill','set-gmail'],'ok',`Gmail — ${emails.length} correos`);
   document.getElementById('gmail-crumb').textContent=`Bandeja — ${emails.length} correos`;
@@ -1575,19 +1503,19 @@ async function loadSent(){
   area.innerHTML=`<div class="email-list">${emails.map(em=>`<div class="email-it"><div class="em-av" style="background:var(--bg5);color:var(--gold)">→</div><div class="em-body"><div class="em-from">Para: ${em.to_email||''}</div><div class="em-subject">${em.subject||'(sin asunto)'}</div><div class="em-preview">${em.preview||''}</div></div><div class="em-meta"><div class="em-time">${em.date||''}</div></div></div>`).join('')}</div>`;}
   catch(e){area.innerHTML=`<div class="empty-state"><div class="e-ico">⚠️</div><p>${e.message}</p></div>`;}
 }
-async function searchEmails(){const q=document.getElementById('email-search').value.trim();if(!q)return toast('Escribe algo','warn');const area=document.getElementById('email-area');area.innerHTML=thinking(`Buscando "${q}"...`);try{const data=await callAI(`Search Gmail inbox for: "${q}". Exclude spam, trash, promotions, social, updates, forums, and drafts. Return ONLY JSON: [{from_name,from_email,subject,date,preview}].`,'Use Gmail tools.',GMAIL);let txt=(getText(data)||getMcp(data)).replace(/```json|```/g,'').trim();let emails=[];try{emails=JSON.parse(txt);}catch{}area.innerHTML=emails.length?`<div class="email-list">${emails.map(em=>`<div class="email-it"><div class="em-av">${(em.from_name||'?')[0].toUpperCase()}</div><div class="em-body"><div class="em-from">${em.from_name||em.from_email}</div><div class="em-subject">${em.subject}</div><div class="em-preview">${em.preview||''}</div></div><div class="em-meta"><div class="em-time">${em.date}</div></div></div>`).join('')}</div>`:'<div class="empty-state"><div class="e-ico">🔍</div><p>Sin resultados</p></div>';}catch(e){area.innerHTML=`<div class="empty-state"><div class="e-ico">⚠️</div><p>${e.message}</p></div>`;}}
+async function searchEmails(){const q=document.getElementById('email-search').value.trim();if(!q)return toast('Escribe algo','warn');const area=document.getElementById('email-area');area.innerHTML=thinking(`Buscando "${q}"...`);try{const data=await callAI(`Search Gmail for: "${q}". Return JSON: [{from_name,from_email,subject,date,preview}].`,'Use Gmail tools.',GMAIL);let txt=(getText(data)||getMcp(data)).replace(/```json|```/g,'').trim();let emails=[];try{emails=JSON.parse(txt);}catch{}area.innerHTML=emails.length?`<div class="email-list">${emails.map(em=>`<div class="email-it"><div class="em-av">${(em.from_name||'?')[0].toUpperCase()}</div><div class="em-body"><div class="em-from">${em.from_name||em.from_email}</div><div class="em-subject">${em.subject}</div><div class="em-preview">${em.preview||''}</div></div><div class="em-meta"><div class="em-time">${em.date}</div></div></div>`).join('')}</div>`:'<div class="empty-state"><div class="e-ico">🔍</div><p>Sin resultados</p></div>';}catch(e){area.innerHTML=`<div class="empty-state"><div class="e-ico">⚠️</div><p>${e.message}</p></div>`;}}
 function replyTo(email,subj){document.getElementById('em-to').value=email;document.getElementById('em-subj').value=subj.startsWith('Re:')?subj:'Re: '+subj;openM('m-compose');}
 
 // ══ CONTACTS ═══════════════════════════════════════
 async function searchContacts(){
   const q=document.getElementById('cont-search').value.trim();if(!q)return loadAllContacts();
   const area=document.getElementById('cont-area');area.innerHTML=thinking(`Buscando "${q}"...`);setPill('cont-pill','syncing');
-  try{const data=await callAI(`Search Google Contacts for: "${q}". Return ONLY JSON: [{name,email,phone,company}]. Max 15.`,'Use Gmail tools.',GMAIL);let txt=(getText(data)||getMcp(data)).replace(/```json|```/g,'').trim();let cs=[];try{cs=JSON.parse(txt);}catch{}setPill('cont-pill','ok',`Contacts — ${cs.length}`);document.getElementById('cont-status').textContent=cs.length+' resultado(s)';renderContactCards(cs,area);}
+  try{const data=await callAI(`Search Gmail contacts for: "${q}". Return JSON: [{name,email,phone,company}]. Max 15.`,'Use Gmail tools.',GMAIL);let txt=(getText(data)||getMcp(data)).replace(/```json|```/g,'').trim();let cs=[];try{cs=JSON.parse(txt);}catch{}setPill('cont-pill','ok',`Contacts — ${cs.length}`);document.getElementById('cont-status').textContent=cs.length+' resultado(s)';renderContactCards(cs,area);}
   catch(e){area.innerHTML=`<div class="empty-state"><div class="e-ico">⚠️</div><p>${e.message}</p></div>`;setPill('cont-pill','err','Error');}
 }
 async function loadAllContacts(){
   const area=document.getElementById('cont-area');area.innerHTML=thinking('Cargando contactos...');setPill('cont-pill','syncing');
-  try{const data=await callAI('List my first 50 Google Contacts. Return ONLY JSON: [{name,email,phone,company}].','Use Gmail tools.',GMAIL);let txt=(getText(data)||getMcp(data)).replace(/```json|```/g,'').trim();let cs=[];try{cs=JSON.parse(txt);}catch{}setPill('cont-pill','ok',`${cs.length} contactos`);document.getElementById('cont-status').textContent=cs.length+' contacto(s)';renderContactCards(cs,area);}
+  try{const data=await callAI('List my 20 most frequent Gmail contacts. Return JSON: [{name,email,phone,company}].','Use Gmail tools.',GMAIL);let txt=(getText(data)||getMcp(data)).replace(/```json|```/g,'').trim();let cs=[];try{cs=JSON.parse(txt);}catch{}setPill('cont-pill','ok',`${cs.length} contactos`);document.getElementById('cont-status').textContent=cs.length+' contacto(s)';renderContactCards(cs,area);}
   catch(e){area.innerHTML=`<div class="empty-state"><div class="e-ico">⚠️</div><p>${e.message}</p></div>`;setPill('cont-pill','err','Error');}
 }
 function renderContactCards(cs,area){area.innerHTML=cs.length?cs.map(c=>`<div class="contact-card"><div class="c-av">${(c.name||c.email||'?')[0].toUpperCase()}</div><div class="c-info"><div class="c-name">${c.name||'Sin nombre'}</div><div class="c-email">✉ ${c.email||'—'}</div>${c.phone?`<div class="c-phone">📞 ${c.phone}</div>`:''}${c.company?`<div class="c-phone">🏢 ${c.company}</div>`:''}</div><div class="c-actions"><button class="btn btn-t" style="font-size:10px;padding:5px 9px" onclick="composeToContact('${escA(c.email||'')}')">✉ Escribir</button><button class="btn btn-ghost" style="font-size:10px;padding:5px 9px" onclick="scheduleWith('${escA(c.email||'')}','${escA(c.name||'')}')">📅 Cita</button></div></div>`).join(''):'<div class="empty-state"><div class="e-ico">👤</div><p>Sin contactos</p></div>';}
@@ -1596,7 +1524,7 @@ function scheduleWith(email,name){document.getElementById('ev-att').value=email;
 
 // Contact picker
 function openCPicker(inputId){S.cpTarget=inputId;document.getElementById('cp-q').value='';document.getElementById('cp-res').innerHTML='<p style="color:var(--text-dim);font-size:12px">Escribe para buscar en Google Contacts.</p>';openM('m-cpicker');}
-async function pickSearch(){const q=document.getElementById('cp-q').value.trim();if(!q)return;document.getElementById('cp-res').innerHTML=thinking('Buscando...');try{const data=await callAI(`Search Google Contacts for: "${q}". Return ONLY JSON: [{name,email}]. Max 8.`,'Use Gmail tools.',GMAIL);let txt=(getText(data)||getMcp(data)).replace(/```json|```/g,'').trim();let cs=[];try{cs=JSON.parse(txt);}catch{}document.getElementById('cp-res').innerHTML=cs.length?cs.map(c=>`<div class="contact-card" style="cursor:pointer" onclick="selContact('${escA(c.email||'')}')"><div class="c-av" style="width:32px;height:32px;font-size:11px">${(c.name||'?')[0].toUpperCase()}</div><div class="c-info"><div class="c-name" style="font-size:13px">${c.name||''}</div><div class="c-email">${c.email||''}</div></div><button class="btn btn-t" style="font-size:10px;padding:4px 8px">Seleccionar</button></div>`).join(''):'<p style="color:var(--text-dim);font-size:12px">Sin resultados</p>';}catch(e){document.getElementById('cp-res').innerHTML=`<p style="color:var(--red);font-size:11px">Error: ${e.message}</p>`;}}
+async function pickSearch(){const q=document.getElementById('cp-q').value.trim();if(!q)return;document.getElementById('cp-res').innerHTML=thinking('Buscando...');try{const data=await callAI(`Search Gmail contacts for: "${q}". Return JSON: [{name,email}]. Max 8.`,'Use Gmail tools.',GMAIL);let txt=(getText(data)||getMcp(data)).replace(/```json|```/g,'').trim();let cs=[];try{cs=JSON.parse(txt);}catch{}document.getElementById('cp-res').innerHTML=cs.length?cs.map(c=>`<div class="contact-card" style="cursor:pointer" onclick="selContact('${escA(c.email||'')}')"><div class="c-av" style="width:32px;height:32px;font-size:11px">${(c.name||'?')[0].toUpperCase()}</div><div class="c-info"><div class="c-name" style="font-size:13px">${c.name||''}</div><div class="c-email">${c.email||''}</div></div><button class="btn btn-t" style="font-size:10px;padding:4px 8px">Seleccionar</button></div>`).join(''):'<p style="color:var(--text-dim);font-size:12px">Sin resultados</p>';}catch(e){document.getElementById('cp-res').innerHTML=`<p style="color:var(--red);font-size:11px">Error: ${e.message}</p>`;}}
 function selContact(email){const inp=document.getElementById(S.cpTarget);if(inp){if(inp.value&&!inp.value.endsWith(',')&&inp.value.trim())inp.value+=', ';inp.value+=email;}closeM('m-cpicker');toast(email+' seleccionado ✓');}
 
 // ══ CALENDAR ═══════════════════════════════════════
@@ -1867,10 +1795,95 @@ document.querySelectorAll('.overlay').forEach(m=>m.addEventListener('click',e=>{
 let _tt;
 function toast(msg,type='ok'){clearTimeout(_tt);document.querySelectorAll('.toast').forEach(t=>t.remove());const t=document.createElement('div');t.className='toast'+(type!=='ok'?' '+type:'');t.textContent=msg;document.body.appendChild(t);_tt=setTimeout(()=>t.remove(),3200);}
 
+
+// ══ SYNC PANEL ════════════════════════════════════
+let syncBusy = false;
+function syncLog(msg){
+  const el = document.getElementById('sync-log');
+  if(!el) return;
+  const t = new Date().toLocaleTimeString('es-US',{hour12:false});
+  if(el.textContent.includes('Esperando sincronización...')) el.innerHTML='';
+  el.innerHTML += `<div>[${t}] ${msg}</div>`;
+  el.scrollTop = el.scrollHeight;
+}
+function setSyncProgress(pct, txt=''){
+  const bar=document.getElementById('sync-progress-bar');
+  const label=document.getElementById('sync-main-status');
+  if(bar){bar.style.width=pct+'%'; bar.textContent=pct+'%';}
+  if(label && txt) label.textContent=txt;
+}
+function setMiniStatus(id,state,txt){
+  const el=document.getElementById(id); if(!el) return; el.className='sync-mini '+state; el.textContent=txt;
+}
+function setSyncButton(disabled){
+  const btn=document.getElementById('btn-sync-all'); if(!btn) return; btn.disabled=disabled; btn.style.opacity=disabled?'.65':'1'; btn.style.pointerEvents=disabled?'none':'auto';
+}
+function ensureGoogleSession(){
+  return new Promise((resolve,reject)=>{
+    if(googleAccessToken){ resolve(true); return; }
+    if(!window.google?.accounts?.oauth2 || !googleTokenClient){ reject(new Error('Google OAuth no está listo.')); return; }
+    syncLog('Solicitando acceso a Google...');
+    googleTokenClient.callback = async (r) => {
+      if(r.error){ reject(new Error(r.error_description || r.error)); return; }
+      try{ await onGoogleToken(r); resolve(true); }catch(e){ reject(e); }
+    };
+    googleTokenClient.requestAccessToken({ prompt:'select_account' });
+  });
+}
+async function syncAllGoogle(){
+  if(syncBusy) return;
+  syncBusy=true;
+  setSyncButton(true);
+  setSyncProgress(0,'Preparando sincronización...');
+  setMiniStatus('sync-gmail-status','idle','Pendiente');
+  setMiniStatus('sync-contacts-status','idle','Pendiente');
+  setMiniStatus('sync-calendar-status','idle','Pendiente');
+  const log=document.getElementById('sync-log'); if(log) log.innerHTML='';
+  syncLog('Inicio de sincronización completa.');
+  try{
+    await ensureGoogleSession();
+    setSyncProgress(15,'Conexión Google lista');
+    syncLog('Sesión de Google activa.');
+
+    setMiniStatus('sync-gmail-status','syncing','Cargando...');
+    setSyncProgress(30,'Cargando Gmail...');
+    await loadInbox();
+    setMiniStatus('sync-gmail-status','ok','Completado');
+    syncLog('Gmail cargado correctamente.');
+
+    setMiniStatus('sync-contacts-status','syncing','Cargando...');
+    setSyncProgress(60,'Cargando contactos...');
+    await loadAllContacts();
+    setMiniStatus('sync-contacts-status','ok','Completado');
+    syncLog('Contactos cargados correctamente.');
+
+    setMiniStatus('sync-calendar-status','syncing','Cargando...');
+    setSyncProgress(85,'Cargando calendario...');
+    await loadCalEvents();
+    setMiniStatus('sync-calendar-status','ok','Completado');
+    syncLog('Calendario cargado correctamente.');
+
+    setSyncProgress(100,'Sincronización completada');
+    document.getElementById('last-sync').textContent = 'Última sincronización: ' + new Date().toLocaleString();
+    toast('Sincronización completada ✓');
+  }catch(e){
+    console.error(e);
+    syncLog('Error: ' + (e.message||e));
+    setSyncProgress(100,'Error en sincronización');
+    toast('Error al sincronizar: ' + (e.message||e),'err');
+    if(document.getElementById('sync-gmail-status')?.classList.contains('syncing')) setMiniStatus('sync-gmail-status','err','Error');
+    if(document.getElementById('sync-contacts-status')?.classList.contains('syncing')) setMiniStatus('sync-contacts-status','err','Error');
+    if(document.getElementById('sync-calendar-status')?.classList.contains('syncing')) setMiniStatus('sync-calendar-status','err','Error');
+  }finally{
+    syncBusy=false;
+    setSyncButton(false);
+  }
+}
+
 // ══ GOOGLE OAUTH 2.0 + DRIVE ══════════════════════
 const GOOGLE_CLIENT_ID = '866504705025-4ks5aefv888jvkdm0uag6i89evjgdems.apps.googleusercontent.com';
 const GOOGLE_SCOPES = [
-  'openid','email','profile',
+  'email','profile',
   'https://www.googleapis.com/auth/gmail.readonly',
   'https://www.googleapis.com/auth/calendar.readonly',
   'https://www.googleapis.com/auth/contacts.readonly',
@@ -1935,17 +1948,6 @@ async function onGoogleToken(r){
   updateProfileUI();
   setSyncAll('ok');
   toast('✅ Google conectado: '+S.googleEmail);
-
-  try{
-    await Promise.allSettled([
-      loadInbox(),
-      loadAllContacts(),
-      loadCalEvents()
-    ]);
-    toast('Google sincronizado ✓');
-  }catch(e){
-    console.error('Post-login sync error:', e);
-  }
 }
 
 function desconectarGoogle(){
