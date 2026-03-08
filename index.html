@@ -273,6 +273,8 @@ body{font-family:'Rajdhani',sans-serif;background:var(--bg);color:var(--text);he
 .email-it:hover{background:rgba(255,255,255,0.04);}
 .email-it.unread{background:rgba(0,212,170,0.03);}
 .email-it.unread:hover{background:rgba(0,212,170,0.06);}
+.email-it.em-selected{background:rgba(0,212,170,0.05);border-left:2px solid var(--teal);}
+.email-it{position:relative;}
 .em-check{width:52px;display:flex;align-items:center;justify-content:center;flex-shrink:0;padding:14px 0;}
 .em-check input[type=checkbox]{width:15px;height:15px;accent-color:var(--teal);cursor:pointer;opacity:0;transition:opacity .15s;}
 .email-it:hover .em-check input,.em-check input:checked{opacity:1;}
@@ -402,6 +404,9 @@ body{font-family:'Rajdhani',sans-serif;background:var(--bg);color:var(--text);he
 /* MODAL */
 .overlay{position:fixed;top:0;right:0;bottom:0;left:var(--nav-w);background:rgba(0,0,0,.78);backdrop-filter:blur(5px);display:none;align-items:center;justify-content:center;z-index:800;}
 .overlay.open{display:flex;}
+/* El modal de evento cubre TODA la pantalla para garantizar visibilidad */
+#m-event{left:0 !important;}
+#m-cpicker{left:0 !important;}
 .modal{background:var(--bg3);border:1px solid var(--border);border-radius:6px;width:500px;max-width:95vw;max-height:90vh;overflow:auto;box-shadow:0 24px 80px rgba(0,0,0,.6);animation:mIn .2s ease;}
 @keyframes mIn{from{opacity:0;transform:scale(.95) translateY(8px)}to{opacity:1;transform:none}}
 .modal.wide{width:680px;}
@@ -1284,6 +1289,8 @@ select option{background:var(--bg3);}
       <div class="ev-head-actions">
         <button class="ev-hbtn primary" id="ev-reply-btn">↩ Responder</button>
         <button class="ev-hbtn" id="ev-forward-btn">→ Reenviar</button>
+        <button class="ev-hbtn" id="ev-delete-btn" style="color:#ff4060" title="Mover a papelera">🗑 Eliminar</button>
+        <button class="ev-hbtn" id="ev-block-btn" style="color:var(--gold)" title="Bloquear remitente">🚫 Bloquear</button>
         <button class="ev-hbtn" onclick="closeM('m-email-view')" style="padding:6px 9px;font-size:14px">✕</button>
       </div>
     </div>
@@ -1756,8 +1763,10 @@ async function loadInbox(){
       const colorIdx=(em.from_name||em.from_email||'?').charCodeAt(0)%colors.length;
       const av=(em.from_name||em.from_email||'?')[0].toUpperCase();
       const dataAttrs=`data-id="${escA(em.id)}" data-from-name="${escA(em.from_name)}" data-from-email="${escA(em.from_email)}" data-to="${escA(em.to)}" data-subject="${escA(em.subject)}" data-date="${escA(em.date_full)}"`;
-      return `<div class="email-it${em.unread?' unread':''}" ${dataAttrs} ondblclick="openEmailViewFromEl(this)" onclick="openEmailViewFromEl(this)">
-        <div class="em-check"><input type="checkbox" onclick="event.stopPropagation()"></div>
+      return `<div class="email-it${em.unread?' unread':''}" ${dataAttrs} onclick="handleEmailClick(event,this)">
+        <div class="em-check" onclick="event.stopPropagation();toggleEmailSelect(this.querySelector('input'),this.closest('.email-it'))">
+          <input type="checkbox">
+        </div>
         <div class="em-av" style="background:${colors[colorIdx]};color:#fff">${av}</div>
         <div class="em-body">
           <div class="em-from${em.unread?' bold':''}">${escH(em.from_name||em.from_email)}</div>
@@ -1773,9 +1782,14 @@ async function loadInbox(){
             ${em.has_att?'<span class="em-badge-att">📎</span>':''}
             ${em.unread?'<span class="em-badge-new">NEW</span>':''}
           </div>
-          <div class="em-actions" style="display:flex;gap:3px;opacity:0;transition:opacity .15s" onmouseenter="this.style.opacity=1" onmouseleave="this.style.opacity=0">
-            <button title="Eliminar" style="background:rgba(255,64,96,.12);border:1px solid rgba(255,64,96,.25);color:#ff4060;border-radius:3px;padding:3px 7px;cursor:pointer;font-size:11px" onclick="event.stopPropagation();deleteEmail('${escA(em.id)}',this.closest('.email-it'))">🗑</button>
-            <button title="Bloquear remitente" style="background:rgba(245,166,35,.10);border:1px solid rgba(245,166,35,.25);color:var(--gold);border-radius:3px;padding:3px 7px;cursor:pointer;font-size:11px" onclick="event.stopPropagation();blockSender('${escA(em.from_email)}','${escA(em.from_name||em.from_email)}')">🚫</button>
+        </div>
+        <div class="em-row-menu" id="menu-${escA(em.id)}" style="display:none;position:absolute;right:8px;top:50%;transform:translateY(-50%);background:var(--bg4);border:1px solid var(--border);border-radius:6px;box-shadow:0 4px 18px rgba(0,0,0,.5);z-index:200;min-width:160px;overflow:hidden">
+          <div style="padding:3px 0">
+            <button onclick="event.stopPropagation();openEmailViewFromEl(this.closest('.email-it'));closeEmailMenus()" style="display:flex;align-items:center;gap:9px;width:100%;background:none;border:none;color:var(--text);padding:8px 14px;cursor:pointer;font-size:12px;font-family:inherit" onmouseover="this.style.background='var(--bg5)'" onmouseout="this.style.background=''">👁 Ver correo</button>
+            <button onclick="event.stopPropagation();forwardEmail('${escA(em.from_email)}','${escA(em.subject)}');closeEmailMenus()" style="display:flex;align-items:center;gap:9px;width:100%;background:none;border:none;color:var(--text);padding:8px 14px;cursor:pointer;font-size:12px;font-family:inherit" onmouseover="this.style.background='var(--bg5)'" onmouseout="this.style.background=''">↪ Reenviar</button>
+            <div style="height:1px;background:var(--border);margin:3px 0"></div>
+            <button onclick="event.stopPropagation();deleteEmailRow('${escA(em.id)}',this.closest('.email-it'));closeEmailMenus()" style="display:flex;align-items:center;gap:9px;width:100%;background:none;border:none;color:#ff4060;padding:8px 14px;cursor:pointer;font-size:12px;font-family:inherit" onmouseover="this.style.background='rgba(255,64,96,.08)'" onmouseout="this.style.background=''">🗑 Eliminar</button>
+            <button onclick="event.stopPropagation();blockSender('${escA(em.from_email)}','${escA(em.from_name||em.from_email)}');closeEmailMenus()" style="display:flex;align-items:center;gap:9px;width:100%;background:none;border:none;color:var(--gold);padding:8px 14px;cursor:pointer;font-size:12px;font-family:inherit" onmouseover="this.style.background='rgba(245,166,35,.08)'" onmouseout="this.style.background=''">🚫 Bloquear remitente</button>
           </div>
         </div>
       </div>`;
@@ -1791,263 +1805,65 @@ function setEmailNav(btn){
   if(btn) btn.classList.add('active');
 }
 
-function markAllRead(){ toast('Función disponible próximamente','warn'); }
+function closeEmailMenus(){
+  document.querySelectorAll('.em-row-menu').forEach(m=>m.style.display='none');
+  document.querySelectorAll('.email-it.em-selected').forEach(r=>r.classList.remove('em-selected'));
+}
 
-// ── Eliminar email ─────────────────────────────────
-async function deleteEmail(msgId, rowEl){
+function handleEmailClick(e, row){
+  const menu = row.querySelector('.em-row-menu');
+  const alreadyOpen = menu && menu.style.display !== 'none';
+  // Cerrar todos los menús primero
+  closeEmailMenus();
+  if(alreadyOpen){ 
+    // Si ya estaba abierto, abrir el email
+    openEmailViewFromEl(row);
+    return;
+  }
+  // Si el click fue en el área del cuerpo del email (no checkbox), abrir el email directamente
+  if(e.target.closest('.em-body') || e.target.closest('.em-av') || e.target.closest('.em-meta')){
+    openEmailViewFromEl(row);
+    return;
+  }
+  openEmailViewFromEl(row);
+}
+
+function toggleEmailSelect(checkbox, row){
+  checkbox.checked = !checkbox.checked;
+  const menu = row.querySelector('.em-row-menu');
+  if(checkbox.checked){
+    closeEmailMenus();
+    row.classList.add('em-selected');
+    if(menu) menu.style.display = 'block';
+    // Cerrar al hacer click fuera
+    setTimeout(()=>{
+      document.addEventListener('click', closeEmailMenus, {once:true});
+    }, 50);
+  } else {
+    row.classList.remove('em-selected');
+    if(menu) menu.style.display = 'none';
+  }
+}
+
+async function deleteEmailRow(msgId, rowEl){
   if(!googleAccessToken){ toast('Conecta Google primero','err'); return; }
   try{
-    rowEl.style.opacity='0.4';rowEl.style.pointerEvents='none';
+    rowEl.style.opacity='0.4'; rowEl.style.pointerEvents='none';
     const r = await fetch(`https://gmail.googleapis.com/gmail/v1/users/me/messages/${msgId}/trash`,{
       method:'POST', headers:{Authorization:'Bearer '+googleAccessToken}
     });
-    if(!r.ok) throw new Error('Error '+r.status);
-    rowEl.style.transition='all .3s';
-    rowEl.style.height='0';rowEl.style.padding='0';rowEl.style.overflow='hidden';
-    setTimeout(()=>rowEl.remove(), 300);
-    toast('Email eliminado ✓');
-  }catch(e){ rowEl.style.opacity='1';rowEl.style.pointerEvents=''; toast('Error al eliminar: '+e.message,'err'); }
-}
-
-// ── Bloquear remitente ─────────────────────────────
-function blockSender(email, label){
-  if(!email){ toast('No se pudo obtener el email','err'); return; }
-  const exists = S.emailSenderFilters.find(f=>f.email===email);
-  if(exists){ toast('Este remitente ya está en tus filtros','warn'); return; }
-  S.emailSenderFilters.push({email, label: label||email, active:false});
-  renderEmailFilters();
-  toast(`🚫 ${email} bloqueado — sus emails no aparecerán`);
-  // Recargar inbox sin ese remitente
-  setTimeout(loadInbox, 400);
-}
-
-// ── Contact Picker (para el campo "Para" del email y eventos) ─────
-function openCPicker(targetInputId){
-  window._cpTarget = targetInputId;
-  const area = document.getElementById('cp-list');
-  if(!area){ toast('Cargando contactos...','warn'); loadCPickerContacts(targetInputId); return; }
-  loadCPickerContacts(targetInputId);
-  openM('m-cpicker');
-}
-
-async function loadCPickerContacts(targetId){
-  // Crear modal de contactos si no existe
-  if(!document.getElementById('m-cpicker')){
-    const div = document.createElement('div');
-    div.className='overlay'; div.id='m-cpicker';
-    div.innerHTML=`<div class="modal" style="width:420px;max-height:80vh;display:flex;flex-direction:column">
-      <div class="m-head"><h2>👤 SELECCIONAR CONTACTO</h2><button class="m-close" onclick="closeM('m-cpicker')">✕</button></div>
-      <div style="padding:12px 20px 0"><input class="m-inp" id="cp-search" placeholder="🔍 Buscar..." oninput="filterCPicker(this.value)" style="margin:0"></div>
-      <div class="m-body" style="flex:1;overflow-y:auto;padding-top:8px" id="cp-list"></div>
-    </div>`;
-    document.body.appendChild(div);
-  }
-  window._cpTarget = targetId;
-  const area = document.getElementById('cp-list');
-  area.innerHTML='<div style="padding:16px;color:var(--text-dim);text-align:center">Cargando contactos...</div>';
-  openM('m-cpicker');
-  if(!googleAccessToken){ area.innerHTML='<div style="padding:16px;color:var(--red);text-align:center">⚠ Conecta Google primero</div>'; return; }
-  try{
-    const res = await fetch('https://people.googleapis.com/v1/people/me/connections?personFields=names,emailAddresses&pageSize=200&sortOrder=FIRST_NAME_ASCENDING',
-      {headers:{Authorization:'Bearer '+googleAccessToken}});
-    const d = await res.json();
-    if(d.error) throw new Error(d.error.message);
-    window._cpContacts = (d.connections||[])
-      .map(p=>({name:(p.names||[])[0]?.displayName||'',email:(p.emailAddresses||[])[0]?.value||''}))
-      .filter(c=>c.email);
-    renderCPicker(window._cpContacts);
-  }catch(e){ area.innerHTML=`<div style="padding:16px;color:var(--red);text-align:center">⚠ ${e.message}</div>`; }
-}
-
-function renderCPicker(contacts){
-  const area = document.getElementById('cp-list');
-  if(!area) return;
-  if(!contacts.length){ area.innerHTML='<div style="padding:16px;color:var(--text-dim);text-align:center">Sin contactos</div>'; return; }
-  area.innerHTML = contacts.map(c=>`
-    <div style="display:flex;align-items:center;gap:10px;padding:9px 20px;cursor:pointer;border-bottom:1px solid rgba(255,255,255,0.05);transition:background .1s" onmouseenter="this.style.background='rgba(0,212,170,0.06)'" onmouseleave="this.style.background=''" onclick="selectContact('${escA(c.email)}','${escA(c.name)}')">
-      <div style="width:32px;height:32px;border-radius:50%;background:linear-gradient(135deg,var(--teal),#00a88a);display:flex;align-items:center;justify-content:center;font-size:13px;font-weight:700;color:#000;flex-shrink:0">${(c.name||c.email)[0].toUpperCase()}</div>
-      <div style="min-width:0;flex:1">
-        <div style="font-size:13px;font-weight:600;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">${escH(c.name||c.email)}</div>
-        <div style="font-size:11px;color:var(--text-dim);overflow:hidden;text-overflow:ellipsis">${escH(c.email)}</div>
-      </div>
-    </div>`).join('');
-}
-
-function filterCPicker(q){
-  if(!window._cpContacts) return;
-  const f = q.toLowerCase();
-  renderCPicker(window._cpContacts.filter(c=>(c.name+c.email).toLowerCase().includes(f)));
-}
-
-function selectContact(email, name){
-  const inp = document.getElementById(window._cpTarget);
-  if(inp){
-    const cur = inp.value.trim();
-    inp.value = cur ? cur+', '+email : email;
-  }
-  closeM('m-cpicker');
-}
-
-function openEmailViewFromEl(el){
-  openEmailView(el.dataset.id,el.dataset.fromName,el.dataset.fromEmail,el.dataset.to,el.dataset.subject,el.dataset.date);
-}
-
-// ── Funciones de filtros ─────────────────────────────
-function openAddSenderFilter(){ document.getElementById('sf-input').value=''; document.getElementById('sf-label').value=''; openM('m-add-sender'); }
-function openAddKeywordFilter(){ document.getElementById('kf-input').value=''; openM('m-add-keyword'); }
-
-function addSenderFilter(){
-  const val=document.getElementById('sf-input').value.trim();
-  if(!val)return toast('Escribe un email o dominio','warn');
-  const lbl=document.getElementById('sf-label').value.trim()||val;
-  S.emailSenderFilters.push({email:val,label:lbl,active:true});
-  closeM('m-add-sender'); renderEmailFilters(); loadInbox(); toast('Filtro añadido ✓');
-}
-function addKeywordFilter(){
-  const val=document.getElementById('kf-input').value.trim();
-  if(!val)return toast('Escribe una palabra clave','warn');
-  S.emailKeywordFilters.push({keyword:val,active:true});
-  closeM('m-add-keyword'); renderEmailFilters(); loadInbox(); toast('Filtro añadido ✓');
-}
-function toggleSenderFilter(i){ S.emailSenderFilters[i].active=!S.emailSenderFilters[i].active; renderEmailFilters(); loadInbox(); }
-function removeSenderFilter(i){ S.emailSenderFilters.splice(i,1); renderEmailFilters(); loadInbox(); }
-function toggleKeywordFilter(i){ S.emailKeywordFilters[i].active=!S.emailKeywordFilters[i].active; renderEmailFilters(); loadInbox(); }
-function removeKeywordFilter(i){ S.emailKeywordFilters.splice(i,1); renderEmailFilters(); loadInbox(); }
-
-function renderEmailFilters(){
-  const sl=document.getElementById('sender-filters-list');
-  const kl=document.getElementById('keyword-filters-list');
-  if(!sl||!kl)return;
-  sl.innerHTML=S.emailSenderFilters.map((f,i)=>`
-    <div class="gmail-nav-btn" style="padding:5px 14px;font-size:12px;color:${f.active?'var(--teal)':'var(--text-dim)'}">
-      <span style="flex:1;overflow:hidden;text-overflow:ellipsis;white-space:nowrap" title="${escH(f.email)}">${escH(f.label)}</span>
-      <button onclick="toggleSenderFilter(${i});event.stopPropagation()" style="background:none;border:none;cursor:pointer;font-size:11px;padding:0 2px;opacity:0.7">${f.active?'✅':'⬜'}</button>
-      <button onclick="removeSenderFilter(${i});event.stopPropagation()" style="background:none;border:none;cursor:pointer;font-size:11px;color:var(--red);padding:0 2px">✕</button>
-    </div>`).join('');
-  kl.innerHTML=S.emailKeywordFilters.map((f,i)=>`
-    <div class="gmail-nav-btn" style="padding:5px 14px;font-size:12px;color:${f.active?'var(--gold)':'var(--text-dim)'}">
-      <span style="flex:1">${escH(f.keyword)}</span>
-      <button onclick="toggleKeywordFilter(${i});event.stopPropagation()" style="background:none;border:none;cursor:pointer;font-size:11px;padding:0 2px;opacity:0.7">${f.active?'✅':'⬜'}</button>
-      <button onclick="removeKeywordFilter(${i});event.stopPropagation()" style="background:none;border:none;cursor:pointer;font-size:11px;color:var(--red);padding:0 2px">✕</button>
-    </div>`).join('');
-}
-
-async function openEmailView(id, fromName, fromEmail, to, subject, date){
-  const colors=['#1a73e8','#e8710a','#0f9d58','#a142f4','#d93025','#1e88e5','#f09300'];
-  const colorIdx=(fromName||fromEmail||'?').charCodeAt(0)%colors.length;
-  const av=(fromName||fromEmail||'?')[0].toUpperCase();
-
-  document.getElementById('ev-modal-subject').textContent=subject;
-  const avEl=document.getElementById('ev-av');
-  avEl.textContent=av; avEl.style.background=colors[colorIdx]; avEl.style.color='#fff';
-  document.getElementById('ev-from-name').textContent=fromName||fromEmail;
-  document.getElementById('ev-from-email').textContent=fromEmail;
-  document.getElementById('ev-to').textContent=to||'—';
-  document.getElementById('ev-date').textContent=date;
-  document.getElementById('ev-reply-btn').onclick=()=>{ replyTo(fromEmail,subject); closeM('m-email-view'); };
-  document.getElementById('ev-forward-btn').onclick=()=>{ forwardEmail(fromEmail,subject); closeM('m-email-view'); };
-
-  // Limpiar adjuntos y body
-  const attBar=document.getElementById('ev-attachments');
-  const attList=document.getElementById('ev-att-list');
-  attBar.style.display='none'; attList.innerHTML='';
-  const bodyEl=document.getElementById('ev-body-content');
-  bodyEl.innerHTML=`<div style="padding:24px;color:#888;font-size:14px">${thinking('Cargando mensaje...')}</div>`;
-  openM('m-email-view');
-
-  try{
-    const r=await fetch(`https://gmail.googleapis.com/gmail/v1/users/me/messages/${id}?format=full`,
-      {headers:{Authorization:'Bearer '+googleAccessToken}});
-    const d=await r.json();
-
-    let htmlBody='', plainBody='', attachments=[];
-
-    function b64dec(data){
-      try{ return decodeURIComponent(escape(atob(data.replace(/-/g,'+').replace(/_/g,'/')))); }
-      catch(e){ try{ return atob(data.replace(/-/g,'+').replace(/_/g,'/')); }catch(e2){ return ''; } }
-    }
-
-    function walkParts(part){
-      if(!part)return;
-      const mime=part.mimeType||'';
-      if(mime==='text/html' && part.body?.data && !htmlBody){
-        htmlBody=b64dec(part.body.data);
-      } else if(mime==='text/plain' && part.body?.data && !plainBody){
-        plainBody=b64dec(part.body.data);
-      } else if(part.filename && part.filename.length>0 && (part.body?.attachmentId||part.body?.size>0)){
-        attachments.push({name:part.filename,mime,size:part.body.size||0,attachmentId:part.body.attachmentId||'',msgId:id});
-      }
-      if(part.parts) part.parts.forEach(walkParts);
-    }
-    walkParts(d.payload);
-    if(!htmlBody && !plainBody && d.payload?.body?.data){
-      const raw=b64dec(d.payload.body.data);
-      if(d.payload.mimeType==='text/html') htmlBody=raw; else plainBody=raw;
-    }
-
-    // ── Renderizar adjuntos ────────────────────────
-    if(attachments.length){
-      attBar.style.display='flex';
-      attList.innerHTML=attachments.map(a=>{
-        const ico=getAttIcon(a.mime,a.name);
-        const sz=a.size>0?(a.size>1048576?(a.size/1048576).toFixed(1)+'MB':a.size>1024?(a.size/1024).toFixed(0)+'KB':a.size+'B'):'';
-        return `<div class="ev-att-chip" onclick="downloadAttachment('${escA(a.msgId)}','${escA(a.attachmentId)}','${escA(a.name)}','${escA(a.mime)}')">
-          <div class="ev-att-chip-ico">${ico}</div>
-          <div class="ev-att-chip-info">
-            <div class="ev-att-chip-name" title="${escH(a.name)}">${escH(a.name)}</div>
-            <div class="ev-att-chip-size">${sz}</div>
-          </div>
-          <span class="ev-att-chip-dl">⬇</span>
-        </div>`;
-      }).join('');
-    }
-
-    // ── Renderizar cuerpo ─── usar iframe para HTML rico con imágenes ──
-    if(htmlBody){
-      // Inyectar base target para links y estilos base
-      const sanitized=htmlBody
-        .replace(/<script[\s\S]*?<\/script>/gi,'')
-        .replace(/javascript:/gi,'');
-      // Usar iframe con srcdoc para aislar estilos y mostrar imágenes correctamente
-      const iframe=document.createElement('iframe');
-      iframe.style.cssText='width:100%;min-height:400px;border:none;background:#fff;';
-      iframe.setAttribute('sandbox','allow-same-origin allow-popups');
-      bodyEl.innerHTML='';
-      bodyEl.appendChild(iframe);
-      // Escribir contenido al iframe
-      const doc=iframe.contentDocument||iframe.contentWindow.document;
-      doc.open();
-      doc.write(`<!DOCTYPE html><html><head><meta charset="UTF-8">
-        <base target="_blank">
-        <style>
-          body{margin:0;padding:20px 24px;font-family:Arial,sans-serif;font-size:14px;line-height:1.6;color:#202124;background:#fff;}
-          img{max-width:100%;height:auto;}
-          a{color:#1a73e8;}
-          *{box-sizing:border-box;}
-        </style></head><body>${sanitized}</body></html>`);
-      doc.close();
-      // Auto-resize iframe
-      iframe.onload=()=>{
-        try{
-          const h=iframe.contentDocument.body.scrollHeight;
-          iframe.style.height=(Math.min(Math.max(h+20,300),700))+'px';
-        }catch(e){}
-      };
-      setTimeout(()=>{
-        try{
-          const h=iframe.contentDocument.body.scrollHeight;
-          iframe.style.height=(Math.min(Math.max(h+20,300),700))+'px';
-        }catch(e){}
-      },500);
-    } else if(plainBody){
-      bodyEl.innerHTML=`<div class="ev-body-text">${escH(plainBody)}</div>`;
-    } else {
-      bodyEl.innerHTML=`<div class="ev-body-text" style="color:#888">(Sin contenido de texto)</div>`;
-    }
+    if(!r.ok) throw new Error('HTTP '+r.status);
+    rowEl.style.transition='max-height .3s, opacity .3s, padding .3s';
+    rowEl.style.maxHeight='0'; rowEl.style.opacity='0'; rowEl.style.overflow='hidden'; rowEl.style.padding='0';
+    setTimeout(()=>rowEl.remove(), 320);
+    toast('✓ Email eliminado');
   }catch(e){
-    bodyEl.innerHTML=`<div class="ev-body-text" style="color:#d93025">Error al cargar: ${escH(e.message)}</div>`;
+    rowEl.style.opacity='1'; rowEl.style.pointerEvents='';
+    toast('Error al eliminar: '+e.message,'err');
   }
 }
+
+function markAllRead(){ toast('Función disponible próximamente','warn'); }
 
 // ── Eliminar email ────────────────────────────────
 async function deleteEmail(msgId){
@@ -3104,9 +2920,16 @@ async function onGoogleToken(r){
     }).then(res=>res.json());
     S.googleEmail = info.email||'';
     S.googleName  = info.name||info.given_name||S.googleEmail.split('@')[0];
-    if(info.picture && S.currentUser){
-      S.currentUser.avatar = info.picture;
-      await svU().catch(()=>{});
+    // Guardar foto siempre - si currentUser no existe todavía, guardar en pending
+    window._googlePicture = info.picture||'';
+    if(info.picture){
+      if(S.currentUser){
+        S.currentUser.avatar = info.picture;
+        await svU().catch(()=>{});
+      }
+      // También actualizar el usuario admin en S.users para que enterApp lo recoja
+      const adminUser = S.users.find(u=>u.role==='admin') || S.users[0];
+      if(adminUser) adminUser.avatar = info.picture;
     }
     // ── Guardar sesión en localStorage para reconexión automática ──
     try{
@@ -3361,14 +3184,16 @@ const _origOpenUploadM = typeof openUploadM !== 'undefined' ? openUploadM : null
     const saved=localStorage.getItem('dv_google_session');
     if(saved){
       const sess=JSON.parse(saved);
-      // El token de Google dura 1h — si guardamos el email/nombre lo usamos
-      // y pedimos un token nuevo silenciosamente al cargar Google API
       if(sess.email){
         S.googleEmail=sess.email;
         S.googleName=sess.name||sess.email.split('@')[0];
-        // Mostrar app directamente sin esperar token
-        // El token se refrescará automático cuando initGoogleAuth esté listo
         window._savedGoogleSession=sess;
+        // Restaurar foto en el usuario admin
+        if(sess.picture){
+          window._googlePicture = sess.picture;
+          const adminUser = S.users.find(u=>u.role==='admin') || S.users[0];
+          if(adminUser) adminUser.avatar = sess.picture;
+        }
       }
     }
   }catch(e){}
