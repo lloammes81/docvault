@@ -314,15 +314,38 @@ body{font-family:'Rajdhani',sans-serif;background:var(--bg);color:var(--text);he
 
 /* CALENDAR */
 .cal-grid{display:grid;grid-template-columns:repeat(7,1fr);gap:2px;}
-.cdh{text-align:center;font-size:9px;letter-spacing:1px;text-transform:uppercase;color:var(--text-dim);padding:7px 0;}
-.cal-day{min-height:76px;background:var(--bg3);border:1px solid var(--border);border-radius:3px;padding:5px;cursor:pointer;transition:all .15s;}
-.cal-day:hover{border-color:rgba(0,212,170,0.28);}
-.cal-day.today{border-color:rgba(0,212,170,0.5);background:var(--teal-bg);}
-.cal-day.other-m{opacity:.3;}
-.cdn{font-size:11px;font-weight:700;margin-bottom:3px;color:var(--text-mid);}
-.cal-day.today .cdn{color:var(--teal);}
-.cal-ev{font-size:9px;background:var(--teal-bg);border-left:2px solid var(--teal);padding:1px 4px;border-radius:1px;margin-bottom:2px;color:var(--teal);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
-.cal-ev.gold{background:var(--gold-bg);border-color:var(--gold);color:var(--gold);}
+.cdh{text-align:center;font-size:9px;letter-spacing:1px;text-transform:uppercase;color:var(--text-dim);padding:7px 0;font-weight:700;}
+.cal-day{min-height:88px;background:var(--bg3);border:1px solid var(--border);border-radius:4px;padding:6px;cursor:pointer;transition:all .15s;position:relative;}
+.cal-day:hover{border-color:rgba(0,212,170,0.4);background:var(--bg4);}
+.cal-day.today{border-color:rgba(0,212,170,0.6);background:rgba(0,212,170,0.06);}
+.cal-day.other-m{opacity:.28;}
+.cal-day.selected{border-color:var(--teal);box-shadow:0 0 0 1px var(--teal);}
+.cdn{font-size:11px;font-weight:700;margin-bottom:4px;color:var(--text-mid);display:flex;align-items:center;justify-content:center;width:22px;height:22px;border-radius:50%;}
+.cal-day.today .cdn{background:var(--teal);color:#000;}
+.cal-ev{font-size:9px;background:rgba(0,212,170,0.12);border-left:2px solid var(--teal);padding:2px 4px;border-radius:2px;margin-bottom:2px;color:var(--teal);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;cursor:pointer;transition:background .1s;}
+.cal-ev:hover{background:rgba(0,212,170,0.22);}
+.cal-ev.gold{background:rgba(245,166,35,0.12);border-color:var(--gold);color:var(--gold);}
+.cal-ev.gold:hover{background:rgba(245,166,35,0.22);}
+.cal-more{font-size:9px;color:var(--text-dim);cursor:pointer;padding:1px 3px;}
+/* Vista día */
+.cal-day-view{display:flex;flex-direction:column;gap:0;}
+.cal-day-header{font-family:'Orbitron',monospace;font-size:13px;color:var(--teal);padding:14px 0 10px;border-bottom:1px solid var(--border);margin-bottom:12px;letter-spacing:1px;}
+.cal-hour-row{display:grid;grid-template-columns:52px 1fr;min-height:48px;border-bottom:1px solid rgba(255,255,255,0.04);}
+.cal-hour-label{font-size:10px;color:var(--text-dim);padding:6px 10px 0;font-family:'Share Tech Mono',monospace;text-align:right;}
+.cal-hour-events{flex:1;position:relative;padding:3px 6px;display:flex;flex-direction:column;gap:2px;}
+.cal-day-ev{background:rgba(0,212,170,0.12);border-left:3px solid var(--teal);border-radius:3px;padding:4px 8px;font-size:11px;color:var(--teal);cursor:pointer;transition:background .15s;}
+.cal-day-ev:hover{background:rgba(0,212,170,0.22);}
+.cal-day-ev.gold{background:rgba(245,166,35,0.12);border-color:var(--gold);color:var(--gold);}
+.cal-day-ev .cev-title{font-weight:700;font-size:12px;}
+.cal-day-ev .cev-time{font-size:10px;opacity:.8;margin-top:1px;}
+/* Upcoming sidebar */
+.up-ev-item{padding:8px 6px;border-bottom:1px solid rgba(255,255,255,0.05);cursor:pointer;}
+.up-ev-item:hover{background:var(--teal-bg);}
+.up-ev-item:last-child{border-bottom:none;}
+.up-ev-dot{width:7px;height:7px;border-radius:50%;background:var(--teal);flex-shrink:0;margin-top:4px;}
+.up-ev-dot.gold{background:var(--gold);}
+.up-ev-title{font-size:12px;font-weight:600;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;}
+.up-ev-time{font-size:10px;color:var(--text-dim);font-family:'Share Tech Mono',monospace;}
 .ev-list-it{display:flex;align-items:flex-start;gap:10px;padding:10px 14px;background:var(--bg3);border:1px solid var(--border);border-radius:4px;margin-bottom:5px;}
 .ev-dot{width:9px;height:9px;border-radius:50%;background:var(--teal);flex-shrink:0;margin-top:4px;}
 .ev-dot.gold{background:var(--gold);}
@@ -767,31 +790,39 @@ select option{background:var(--bg3);}
       <div class="topbar">
         <span class="topbar-title">📅 CALENDARIO</span>
         <div class="topbar-sep"></div>
-        <div class="topbar-crumb">Google Calendar conectado</div>
+        <div class="topbar-crumb" id="cal-crumb">Google Calendar</div>
         <div id="cal-pill" class="sync-pill idle"><div class="sp-dot"></div>Sin sincronizar</div>
         <button class="btn btn-t" style="font-size:11px;padding:5px 10px" onclick="loadCalEvents()">↺ Sync</button>
+        <button class="btn btn-solid" style="font-size:11px;padding:5px 12px" onclick="openEventM()">＋ Nueva Cita</button>
       </div>
       <div style="display:flex;flex:1;overflow:hidden">
         <div class="side-panel">
           <div class="side-head"><h3>Agenda</h3></div>
           <div class="side-list">
-            <button class="btn btn-solid" style="width:100%;justify-content:center;margin-bottom:10px" onclick="openEventM()">＋ Nueva Cita</button>
-            <div class="s-label">Próximos Eventos</div>
-            <div id="upcoming-events"><div style="color:var(--text-dim);font-size:11px">Cargando...</div></div>
-            <button class="btn btn-ghost" style="width:100%;justify-content:center;margin-top:8px;font-size:11px" onclick="loadCalEvents()">↺ Actualizar</button>
+            <!-- Vista toggle -->
+            <div class="s-label">Vista</div>
+            <div style="display:flex;gap:4px;margin-bottom:10px">
+              <button id="cal-v-month" class="btn btn-solid" style="flex:1;justify-content:center;font-size:11px" onclick="setCalView('month')">Mes</button>
+              <button id="cal-v-day" class="btn btn-ghost" style="flex:1;justify-content:center;font-size:11px" onclick="setCalView('day')">Día</button>
+            </div>
+            <div class="s-label">Próximos</div>
+            <div id="upcoming-events"><div style="color:var(--text-dim);font-size:11px;padding:4px">Sin eventos</div></div>
           </div>
         </div>
         <div class="content-area">
           <div class="toolbar">
             <button class="btn btn-ghost" onclick="calPrev()">← Anterior</button>
-            <div style="font-family:'Orbitron',monospace;font-size:13px;color:var(--teal);letter-spacing:1px;flex:1;text-align:center" id="cal-label"></div>
+            <div id="cal-label" style="font-family:'Orbitron',monospace;font-size:13px;color:var(--teal);letter-spacing:1px;flex:1;text-align:center"></div>
             <button class="btn btn-ghost" onclick="calNext()">Siguiente →</button>
-            <button class="btn btn-t" onclick="loadCalEvents()">↺ Sincronizar</button>
+            <button class="btn btn-ghost" onclick="calToday()">Hoy</button>
           </div>
-          <div class="content-scroll">
-            <div class="cal-grid" id="cal-headers"></div>
-            <div class="cal-grid" id="cal-grid" style="margin-top:3px"></div>
-            <div id="cal-msg" style="margin-top:10px"></div>
+          <div class="content-scroll" id="cal-scroll">
+            <div id="cal-view-month">
+              <div class="cal-grid" id="cal-headers"></div>
+              <div class="cal-grid" id="cal-grid" style="margin-top:3px"></div>
+            </div>
+            <div id="cal-view-day" style="display:none"></div>
+            <div id="cal-msg" style="margin-top:10px;padding:0 4px"></div>
           </div>
         </div>
       </div>
@@ -1655,7 +1686,7 @@ async function loadInbox(){
     setPill(['gmail-pill','set-gmail'],'err','Sin conexión');return;
   }
   try{
-    let queryParts=['in:inbox category:primary -in:spam -in:trash'];
+    let queryParts=['in:inbox -in:spam -in:trash -label:promotions -label:social -category:promotions -category:social'];
     const activeSenders=S.emailSenderFilters.filter(f=>f.active);
     const activeKeywords=S.emailKeywordFilters.filter(f=>f.active);
     if(activeSenders.length){
@@ -2179,60 +2210,287 @@ async function searchContacts(){
   }catch(e){area.innerHTML=`<div class="empty-state"><div class="e-ico">⚠️</div><p>${e.message}</p></div>`;}
 }
 
-async function loadCalEvents(){
-  const upEl=document.getElementById('upcoming-events');const msg=document.getElementById('cal-msg');
-  upEl.innerHTML='<div style="color:var(--text-dim);font-size:11px">Cargando...</div>';msg.innerHTML=thinking('Sincronizando Google Calendar...');setPill(['cal-pill','set-cal'],'syncing','Cargando...');
-  if(!googleAccessToken){msg.innerHTML='<div class="ai-result err">⚠ Conecta tu cuenta Google primero</div>';upEl.innerHTML='<div style="color:var(--text-dim);font-size:11px">Sin conexión</div>';setPill(['cal-pill','set-cal'],'err','Sin conexión');return;}
-  try{
-    const now=new Date().toISOString();
-    const end=new Date(Date.now()+30*24*60*60*1000).toISOString();
-    const res=await fetch(`https://www.googleapis.com/calendar/v3/calendars/primary/events?timeMin=${encodeURIComponent(now)}&timeMax=${encodeURIComponent(end)}&singleEvents=true&orderBy=startTime&maxResults=50`,{headers:{Authorization:'Bearer '+googleAccessToken}});
-    const d=await res.json();
-    if(d.error)throw new Error(d.error.message);
-    S.calEvents=(d.items||[]).map(ev=>({title:ev.summary||'(sin título)',start:ev.start?.dateTime||ev.start?.date||'',end:ev.end?.dateTime||ev.end?.date||'',location:ev.location||'',attendees:(ev.attendees||[]).map(a=>a.email),description:ev.description||''}));
-    renderCalGrid();msg.innerHTML='';setPill(['cal-pill','set-cal'],'ok',`Calendar — ${S.calEvents.length} eventos`);
-    const upcoming=S.calEvents.slice(0,5);
-    upEl.innerHTML=upcoming.length?upcoming.map((ev,i)=>`<div class="ev-list-it"><div class="ev-dot ${i>0?'gold':''}"></div><div class="ev-info"><div class="ev-title">${ev.title}</div><div class="ev-time">${fDate(ev.start)}</div>${ev.location?`<div class="ev-att">📍 ${ev.location}</div>`:''}${ev.attendees?.length?`<div class="ev-att">👥 ${ev.attendees.slice(0,2).join(', ')}</div>`:''}</div></div>`).join(''):'<div style="color:var(--text-dim);font-size:11px">Sin eventos</div>';
-    toast(S.calEvents.length+' eventos cargados ✓');
-  }catch(e){msg.innerHTML=`<div class="ai-result err">⚠ ${e.message}</div>`;upEl.innerHTML='<div style="color:var(--red);font-size:11px">Error</div>';setPill(['cal-pill','set-cal'],'err','Error Calendar');}
+// ══ CALENDARIO ══════════════════════════════════════
+const CAL = {
+  view: 'month',       // 'month' | 'day'
+  date: new Date(),    // fecha actual navegando
+  today: new Date(),
+};
+
+function initCal(){
+  CAL.today = new Date();
+  if(!CAL.date) CAL.date = new Date();
+  renderCalendar();
 }
-function openEventM(){document.getElementById('event-msg').innerHTML='';openM('m-event');}
-async function createEvent(){
-  const title=document.getElementById('ev-title').value.trim();
-  const start=document.getElementById('ev-start').value;
-  const end=document.getElementById('ev-end').value;
-  const desc=document.getElementById('ev-desc').value.trim();
-  const loc=document.getElementById('ev-loc').value.trim();
-  const att=document.getElementById('ev-att').value.trim();
-  const msg=document.getElementById('event-msg');
-  if(!title){toast('El título es requerido','err');return;}
-  if(!start||!end){toast('Agrega fecha de inicio y fin','err');return;}
-  if(!googleAccessToken){msg.innerHTML='<div class="ai-result err">⚠ Reconecta tu cuenta Google en Configuración.</div>';return;}
-  if(new Date(end)<=new Date(start)){toast('La fecha fin debe ser posterior al inicio','err');return;}
-  msg.innerHTML=thinking('Creando evento en Google Calendar...');
-  const attList=att?att.split(',').map(x=>x.trim()).filter(Boolean):[];
-  const tz=Intl.DateTimeFormat().resolvedOptions().timeZone||'America/Mexico_City';
-  const event={summary:title,start:{dateTime:new Date(start).toISOString(),timeZone:tz},end:{dateTime:new Date(end).toISOString(),timeZone:tz}};
-  if(desc)event.description=desc;
-  if(loc)event.location=loc;
-  if(attList.length)event.attendees=attList.map(e=>({email:e}));
-  async function doCreate(){
-    const r=await fetch('https://www.googleapis.com/calendar/v3/calendars/primary/events?sendUpdates=none',{method:'POST',headers:{Authorization:'Bearer '+googleAccessToken,'Content-Type':'application/json'},body:JSON.stringify(event)});
-    return r.json();
+
+function setCalView(v){
+  CAL.view = v;
+  document.getElementById('cal-v-month').className = v==='month' ? 'btn btn-solid' : 'btn btn-ghost';
+  document.getElementById('cal-v-day').className   = v==='day'   ? 'btn btn-solid' : 'btn btn-ghost';
+  document.getElementById('cal-v-month').style.cssText = 'flex:1;justify-content:center;font-size:11px';
+  document.getElementById('cal-v-day').style.cssText   = 'flex:1;justify-content:center;font-size:11px';
+  renderCalendar();
+}
+
+function calPrev(){
+  if(CAL.view==='month'){
+    CAL.date = new Date(CAL.date.getFullYear(), CAL.date.getMonth()-1, 1);
+  } else {
+    CAL.date = new Date(CAL.date.getTime() - 86400000);
+  }
+  renderCalendar();
+}
+function calNext(){
+  if(CAL.view==='month'){
+    CAL.date = new Date(CAL.date.getFullYear(), CAL.date.getMonth()+1, 1);
+  } else {
+    CAL.date = new Date(CAL.date.getTime() + 86400000);
+  }
+  renderCalendar();
+}
+function calToday(){
+  CAL.date = new Date();
+  renderCalendar();
+}
+
+function renderCalendar(){
+  if(CAL.view==='month') renderCalMonth();
+  else renderCalDay();
+  renderUpcoming();
+}
+
+function renderCalMonth(){
+  document.getElementById('cal-view-month').style.display = '';
+  document.getElementById('cal-view-day').style.display = 'none';
+  const y = CAL.date.getFullYear(), m = CAL.date.getMonth();
+  const MESES = ['Enero','Febrero','Marzo','Abril','Mayo','Junio','Julio','Agosto','Septiembre','Octubre','Noviembre','Diciembre'];
+  document.getElementById('cal-label').textContent = MESES[m] + ' ' + y;
+  document.getElementById('cal-crumb').textContent = MESES[m] + ' ' + y;
+  // headers
+  const dias = ['Dom','Lun','Mar','Mié','Jue','Vie','Sáb'];
+  document.getElementById('cal-headers').innerHTML = dias.map(d=>`<div class="cdh">${d}</div>`).join('');
+  // días del mes
+  const firstDay = new Date(y, m, 1).getDay();
+  const daysInMonth = new Date(y, m+1, 0).getDate();
+  const prevDays = new Date(y, m, 0).getDate();
+  let cells = '';
+  // días del mes anterior
+  for(let i=firstDay-1; i>=0; i--){
+    cells += `<div class="cal-day other-m"><div class="cdn">${prevDays-i}</div></div>`;
+  }
+  const todayStr = `${CAL.today.getFullYear()}-${String(CAL.today.getMonth()+1).padStart(2,'0')}-${String(CAL.today.getDate()).padStart(2,'0')}`;
+  for(let d=1; d<=daysInMonth; d++){
+    const dateStr = `${y}-${String(m+1).padStart(2,'0')}-${String(d).padStart(2,'0')}`;
+    const isToday = dateStr===todayStr;
+    const dayEvs = (S.calEvents||[]).filter(ev=>{
+      const evDate = ev.start ? ev.start.substring(0,10) : '';
+      return evDate === dateStr;
+    });
+    const evHTML = dayEvs.slice(0,3).map((ev,i)=>`<div class="cal-ev${i>0?' gold':''}" title="${escH(ev.title)}" onclick="event.stopPropagation();showEventDetail(${S.calEvents.indexOf(ev)})">${escH(ev.title)}</div>`).join('');
+    const more = dayEvs.length>3 ? `<div class="cal-more">+${dayEvs.length-3} más</div>` : '';
+    cells += `<div class="cal-day${isToday?' today':''}" onclick="CAL.date=new Date(${y},${m},${d});setCalView('day')">
+      <div class="cdn">${d}</div>${evHTML}${more}
+    </div>`;
+  }
+  // días del mes siguiente
+  const totalCells = Math.ceil((firstDay + daysInMonth) / 7) * 7;
+  let next = 1;
+  for(let i=firstDay+daysInMonth; i<totalCells; i++, next++){
+    cells += `<div class="cal-day other-m"><div class="cdn">${next}</div></div>`;
+  }
+  document.getElementById('cal-grid').innerHTML = cells;
+  document.getElementById('cal-msg').innerHTML = '';
+}
+
+function renderCalDay(){
+  document.getElementById('cal-view-month').style.display = 'none';
+  document.getElementById('cal-view-day').style.display = '';
+  const d = CAL.date;
+  const DIAS = ['Domingo','Lunes','Martes','Miércoles','Jueves','Viernes','Sábado'];
+  const MESES = ['Enero','Febrero','Marzo','Abril','Mayo','Junio','Julio','Agosto','Septiembre','Octubre','Noviembre','Diciembre'];
+  const label = `${DIAS[d.getDay()]}, ${d.getDate()} de ${MESES[d.getMonth()]} ${d.getFullYear()}`;
+  document.getElementById('cal-label').textContent = label;
+  document.getElementById('cal-crumb').textContent = label;
+  const dateStr = `${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,'0')}-${String(d.getDate()).padStart(2,'0')}`;
+  const dayEvs = (S.calEvents||[]).filter(ev=>{
+    const evDate = ev.start ? ev.start.substring(0,10) : '';
+    return evDate === dateStr;
+  });
+  // Eventos todo el día (sin hora)
+  const allDay = dayEvs.filter(ev=>ev.start && ev.start.length===10);
+  const timed  = dayEvs.filter(ev=>ev.start && ev.start.length>10);
+  let html = `<div style="padding:0 4px">`;
+  if(allDay.length){
+    html += `<div style="margin-bottom:14px"><div class="s-label">Todo el día</div>`;
+    html += allDay.map((ev,i)=>`<div class="cal-day-ev${i>0?' gold':''}" onclick="showEventDetail(${S.calEvents.indexOf(ev)})">
+      <div class="cev-title">${escH(ev.title)}</div>
+      ${ev.location?`<div class="cev-time">📍 ${escH(ev.location)}</div>`:''}
+    </div>`).join('');
+    html += `</div>`;
+  }
+  // Horas del día
+  html += `<div class="cal-day-view">`;
+  for(let h=0; h<24; h++){
+    const hLabel = h===0?'12 AM':h<12?h+' AM':h===12?'12 PM':(h-12)+' PM';
+    const hEvs = timed.filter(ev=>{
+      const evH = new Date(ev.start).getHours();
+      return evH===h;
+    });
+    const nowH = new Date().getHours();
+    const isNowH = dateStr === `${CAL.today.getFullYear()}-${String(CAL.today.getMonth()+1).padStart(2,'0')}-${String(CAL.today.getDate()).padStart(2,'0')}` && h===nowH;
+    html += `<div class="cal-hour-row${isNowH?' ':''}" style="${isNowH?'background:rgba(0,212,170,0.04)':''}">
+      <div class="cal-hour-label">${hLabel}</div>
+      <div class="cal-hour-events">${hEvs.map((ev,i)=>`<div class="cal-day-ev${i>0?' gold':''}" onclick="showEventDetail(${S.calEvents.indexOf(ev)})">
+        <div class="cev-title">${escH(ev.title)}</div>
+        <div class="cev-time">${fDate(ev.start)}${ev.location?' · 📍'+escH(ev.location):''}</div>
+        ${ev.attendees?.length?`<div class="cev-time">👥 ${ev.attendees.slice(0,2).join(', ')}</div>`:''}
+      </div>`).join('')}</div>
+    </div>`;
+  }
+  html += `</div></div>`;
+  // Scroll al horario actual si es hoy
+  document.getElementById('cal-view-day').innerHTML = html;
+  document.getElementById('cal-msg').innerHTML = '';
+  if(dateStr === `${CAL.today.getFullYear()}-${String(CAL.today.getMonth()+1).padStart(2,'0')}-${String(CAL.today.getDate()).padStart(2,'0')}`){
+    setTimeout(()=>{
+      const nowH = new Date().getHours();
+      const rows = document.querySelectorAll('.cal-hour-row');
+      if(rows[nowH]) rows[nowH].scrollIntoView({block:'center',behavior:'smooth'});
+    },100);
+  }
+}
+
+function renderUpcoming(){
+  const upEl = document.getElementById('upcoming-events');
+  if(!upEl) return;
+  const now = Date.now();
+  const upcoming = (S.calEvents||[])
+    .filter(ev=>ev.start && new Date(ev.start).getTime() >= now)
+    .slice(0,8);
+  if(!upcoming.length){
+    upEl.innerHTML = '<div style="color:var(--text-dim);font-size:11px;padding:4px">Sin próximos eventos</div>';
+    return;
+  }
+  upEl.innerHTML = upcoming.map((ev,i)=>`
+    <div class="up-ev-item" onclick="CAL.date=new Date('${ev.start}');setCalView('day')">
+      <div style="display:flex;gap:6px;align-items:flex-start">
+        <div class="up-ev-dot${i>2?' gold':''}"></div>
+        <div style="min-width:0;flex:1">
+          <div class="up-ev-title">${escH(ev.title)}</div>
+          <div class="up-ev-time">${fDate(ev.start)}</div>
+          ${ev.location?`<div class="up-ev-time">📍 ${escH(ev.location)}</div>`:''}
+        </div>
+      </div>
+    </div>`).join('');
+}
+
+function showEventDetail(idx){
+  const ev = (S.calEvents||[])[idx];
+  if(!ev) return;
+  // Reusar modal de evento para mostrar detalle
+  const msg = document.getElementById('event-msg');
+  document.getElementById('ev-title').value = ev.title||'';
+  document.getElementById('ev-start').value = ev.start ? ev.start.substring(0,16) : '';
+  document.getElementById('ev-end').value   = ev.end   ? ev.end.substring(0,16)   : '';
+  document.getElementById('ev-desc').value  = ev.description||'';
+  document.getElementById('ev-loc').value   = ev.location||'';
+  document.getElementById('ev-att').value   = (ev.attendees||[]).join(', ');
+  if(msg) msg.innerHTML = '';
+  openM('m-event');
+}
+
+async function loadCalEvents(){
+  const upEl = document.getElementById('upcoming-events');
+  const msg  = document.getElementById('cal-msg');
+  if(upEl) upEl.innerHTML = '<div style="color:var(--text-dim);font-size:11px;padding:4px">Cargando...</div>';
+  if(msg) msg.innerHTML = thinking('Sincronizando Google Calendar...');
+  setPill(['cal-pill','set-cal'],'syncing','Cargando...');
+  if(!googleAccessToken){
+    if(msg) msg.innerHTML = '<div class="ai-result err">⚠ Conecta tu cuenta Google en Configuración</div>';
+    if(upEl) upEl.innerHTML = '<div style="color:var(--text-dim);font-size:11px;padding:4px">Sin conexión</div>';
+    setPill(['cal-pill','set-cal'],'err','Sin conexión'); return;
   }
   try{
-    let d=await doCreate();
-    if(d.error?.code===401){
-      msg.innerHTML=thinking('Renovando sesión Google...');
-      await new Promise((res,rej)=>{googleTokenClient.callback=r=>{googleTokenClient.callback=onGoogleToken;if(r.error)rej(new Error(r.error));else{googleAccessToken=r.access_token;res();}};googleTokenClient.requestAccessToken({hint:S.googleEmail,prompt:''});});
-      d=await doCreate();
-    }
-    if(d.error)throw new Error(d.error.message+' ('+d.error.code+')');
-    msg.innerHTML='<div class="ai-result">✅ Evento creado: <strong>'+escH(d.summary||title)+'</strong></div>';
-    S.calEvents.push({title,start:new Date(start).toISOString(),end:new Date(end).toISOString(),location:loc,attendees:attList});
-    renderCalGrid();toast('Cita creada en Google Calendar ✓');
-    setTimeout(()=>{closeM('m-event');msg.innerHTML='';},2200);
-  }catch(e){msg.innerHTML='<div class="ai-result err">⚠ '+escH(e.message)+'</div>';toast('Error al crear cita','err');}
+    // Cargar 3 meses pasados y 6 meses futuros
+    const timeMin = new Date(Date.now() - 90*86400000).toISOString();
+    const timeMax = new Date(Date.now() + 180*86400000).toISOString();
+    const res = await fetch(
+      `https://www.googleapis.com/calendar/v3/calendars/primary/events?timeMin=${encodeURIComponent(timeMin)}&timeMax=${encodeURIComponent(timeMax)}&singleEvents=true&orderBy=startTime&maxResults=250`,
+      {headers:{Authorization:'Bearer '+googleAccessToken}}
+    );
+    const d = await res.json();
+    if(d.error) throw new Error(d.error.message);
+    S.calEvents = (d.items||[]).map(ev=>({
+      id: ev.id,
+      title: ev.summary||'(sin título)',
+      start: ev.start?.dateTime||ev.start?.date||'',
+      end:   ev.end?.dateTime||ev.end?.date||'',
+      location: ev.location||'',
+      attendees: (ev.attendees||[]).map(a=>a.email),
+      description: ev.description||''
+    }));
+    renderCalendar();
+    if(msg) msg.innerHTML = '';
+    setPill(['cal-pill','set-cal'],'ok',`Calendar — ${S.calEvents.length}`);
+    document.getElementById('cal-crumb').textContent = `${S.calEvents.length} eventos sincronizados`;
+    toast(S.calEvents.length+' eventos de Google Calendar ✓');
+  }catch(e){
+    if(msg) msg.innerHTML = `<div class="ai-result err">⚠ ${escH(e.message)}</div>`;
+    setPill(['cal-pill','set-cal'],'err','Error Calendar');
+  }
+}
+
+function openEventM(){
+  ['ev-title','ev-desc','ev-loc','ev-att'].forEach(id=>{const el=document.getElementById(id);if(el)el.value='';});
+  const now = toLocal(new Date());
+  const end = toLocal(new Date(Date.now()+3600000));
+  document.getElementById('ev-start').value = now;
+  document.getElementById('ev-end').value   = end;
+  const msg = document.getElementById('event-msg');
+  if(msg) msg.innerHTML = '';
+  openM('m-event');
+}
+
+async function createEvent(){
+  const title = document.getElementById('ev-title').value.trim();
+  const start = document.getElementById('ev-start').value;
+  const end   = document.getElementById('ev-end').value;
+  const desc  = document.getElementById('ev-desc').value.trim();
+  const loc   = document.getElementById('ev-loc').value.trim();
+  const att   = document.getElementById('ev-att').value.trim();
+  const msg   = document.getElementById('event-msg');
+  if(!title){ toast('El título es requerido','err'); return; }
+  if(!start||!end){ toast('Agrega fecha de inicio y fin','err'); return; }
+  if(!googleAccessToken){ if(msg) msg.innerHTML='<div class="ai-result err">⚠ Conecta tu cuenta Google primero</div>'; return; }
+  if(new Date(end)<=new Date(start)){ toast('La fecha fin debe ser posterior al inicio','err'); return; }
+  if(msg) msg.innerHTML = thinking('Creando evento en Google Calendar...');
+  const attList = att ? att.split(',').map(x=>x.trim()).filter(Boolean) : [];
+  const tz = Intl.DateTimeFormat().resolvedOptions().timeZone||'America/Mexico_City';
+  const event = {
+    summary: title,
+    start:{dateTime: new Date(start).toISOString(), timeZone: tz},
+    end:  {dateTime: new Date(end).toISOString(),   timeZone: tz}
+  };
+  if(desc) event.description = desc;
+  if(loc)  event.location    = loc;
+  if(attList.length) event.attendees = attList.map(e=>({email:e}));
+  try{
+    const r = await fetch('https://www.googleapis.com/calendar/v3/calendars/primary/events?sendUpdates=none',{
+      method:'POST',
+      headers:{Authorization:'Bearer '+googleAccessToken,'Content-Type':'application/json'},
+      body: JSON.stringify(event)
+    });
+    const d = await r.json();
+    if(d.error) throw new Error(d.error.message+' ('+d.error.code+')');
+    if(msg) msg.innerHTML = `<div class="ai-result">✅ Evento creado: <strong>${escH(d.summary||title)}</strong></div>`;
+    S.calEvents.push({id:d.id,title,start:new Date(start).toISOString(),end:new Date(end).toISOString(),location:loc,attendees:attList,description:desc});
+    renderCalendar();
+    toast('Cita creada en Google Calendar ✓');
+    setTimeout(()=>{ closeM('m-event'); if(msg) msg.innerHTML=''; }, 2000);
+  }catch(e){
+    if(msg) msg.innerHTML = `<div class="ai-result err">⚠ ${escH(e.message)}</div>`;
+    toast('Error al crear cita','err');
+  }
 }
 
 // ══ USERS ══════════════════════════════════════════
