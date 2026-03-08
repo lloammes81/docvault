@@ -1591,8 +1591,8 @@ async function loadInbox(){
     setPill(['gmail-pill','set-gmail'],'err','Sin conexión');return;
   }
   try{
-    // Construir query con filtros activos
-    let queryParts=['in:inbox -category:promotions -category:social -category:updates -category:forums -in:spam -in:trash'];
+    // Solo correos de la categoría PRIMARY de Gmail (la más limpia — sin anuncios, social ni notificaciones)
+    let queryParts=['in:inbox category:primary -in:spam -in:trash'];
     const activeSenders=S.emailSenderFilters.filter(f=>f.active);
     const activeKeywords=S.emailKeywordFilters.filter(f=>f.active);
     if(activeSenders.length){
@@ -2005,34 +2005,35 @@ async function createEvent(){
   const desc=document.getElementById('ev-desc').value.trim();
   const loc=document.getElementById('ev-loc').value.trim();
   const att=document.getElementById('ev-att').value.trim();
-  if(!title)return toast('El título es requerido','err');
-  if(!start||!end)return toast('Las fechas de inicio y fin son requeridas','err');
-  if(!googleAccessToken)return toast('Conecta tu cuenta Google primero','err');
-  if(new Date(end)<=new Date(start))return toast('La fecha de fin debe ser posterior al inicio','err');
-  const msg=document.getElementById('event-msg');msg.innerHTML=thinking('Creando evento en Google Calendar...');
+  const msg=document.getElementById('event-msg');
+  if(!title){toast('El título es requerido','err');return;}
+  if(!start||!end){toast('Agrega fecha de inicio y fin','err');return;}
+  if(!googleAccessToken){msg.innerHTML='<div class="ai-result err">⚠ Reconecta tu cuenta Google en Configuración.</div>';return;}
+  if(new Date(end)<=new Date(start)){toast('La fecha fin debe ser posterior al inicio','err');return;}
+  msg.innerHTML=thinking('Creando evento en Google Calendar...');
   const attList=att?att.split(',').map(x=>x.trim()).filter(Boolean):[];
+  const tz=Intl.DateTimeFormat().resolvedOptions().timeZone||'America/Mexico_City';
+  const event={summary:title,start:{dateTime:new Date(start).toISOString(),timeZone:tz},end:{dateTime:new Date(end).toISOString(),timeZone:tz}};
+  if(desc)event.description=desc;
+  if(loc)event.location=loc;
+  if(attList.length)event.attendees=attList.map(e=>({email:e}));
+  async function doCreate(){
+    const r=await fetch('https://www.googleapis.com/calendar/v3/calendars/primary/events?sendUpdates=none',{method:'POST',headers:{Authorization:'Bearer '+googleAccessToken,'Content-Type':'application/json'},body:JSON.stringify(event)});
+    return r.json();
+  }
   try{
-    const event={
-      summary:title,
-      start:{dateTime:new Date(start).toISOString(),timeZone:Intl.DateTimeFormat().resolvedOptions().timeZone},
-      end:{dateTime:new Date(end).toISOString(),timeZone:Intl.DateTimeFormat().resolvedOptions().timeZone}
-    };
-    if(desc)event.description=desc;
-    if(loc)event.location=loc;
-    if(attList.length)event.attendees=attList.map(e=>({email:e}));
-    const res=await fetch('https://www.googleapis.com/calendar/v3/calendars/primary/events?sendUpdates=none',{
-      method:'POST',
-      headers:{Authorization:'Bearer '+googleAccessToken,'Content-Type':'application/json'},
-      body:JSON.stringify(event)
-    });
-    const d=await res.json();
-    if(d.error)throw new Error(d.error.message+' (código: '+d.error.code+')');
-    msg.innerHTML=`<div class="ai-result">✅ Evento creado: <strong>${escH(d.summary)}</strong></div>`;
+    let d=await doCreate();
+    if(d.error?.code===401){
+      msg.innerHTML=thinking('Renovando sesión Google...');
+      await new Promise((res,rej)=>{googleTokenClient.callback=r=>{googleTokenClient.callback=onGoogleToken;if(r.error)rej(new Error(r.error));else{googleAccessToken=r.access_token;res();}};googleTokenClient.requestAccessToken({hint:S.googleEmail,prompt:''});});
+      d=await doCreate();
+    }
+    if(d.error)throw new Error(d.error.message+' ('+d.error.code+')');
+    msg.innerHTML='<div class="ai-result">✅ Evento creado: <strong>'+escH(d.summary||title)+'</strong></div>';
     S.calEvents.push({title,start:new Date(start).toISOString(),end:new Date(end).toISOString(),location:loc,attendees:attList});
-    renderCalGrid();
-    toast('Cita creada ✓');
-    setTimeout(()=>{closeM('m-event');msg.innerHTML='';},2000);
-  }catch(e){msg.innerHTML=`<div class="ai-result err">⚠ ${e.message}</div>`;toast('Error: '+e.message,'err');}
+    renderCalGrid();toast('Cita creada en Google Calendar ✓');
+    setTimeout(()=>{closeM('m-event');msg.innerHTML='';},2200);
+  }catch(e){msg.innerHTML='<div class="ai-result err">⚠ '+escH(e.message)+'</div>';toast('Error al crear cita','err');}
 }
 
 // ══ USERS ══════════════════════════════════════════
@@ -2362,6 +2363,7 @@ const GOOGLE_SCOPES = [
 
 let googleAccessToken = null;
 let googleTokenClient = null;
+let googleTokenExpiry = null;
 let dvFolderId = null;
 let photosFolderId = null;
 
@@ -2371,7 +2373,18 @@ function initGoogleAuth(){
     client_id: GOOGLE_CLIENT_ID,
     scope: GOOGLE_SCOPES,
     callback: onGoogleToken,
+    // prompt vacío = reconexión silenciosa si ya hay sesión
+    prompt: '',
   });
+  // Si hay sesión guardada, pedir token nuevo automáticamente (silent refresh)
+  if(window._savedGoogleSession?.email){
+    try{
+      googleTokenClient.requestAccessToken({
+        hint: window._savedGoogleSession.email,
+        prompt: ''
+      });
+    }catch(e){ console.log('Silent refresh failed, user will need to login'); }
+  }
 }
 
 function triggerGoogleOAuth(){
@@ -2388,10 +2401,15 @@ function triggerGoogleOAuth(){
 
 async function onGoogleToken(r){
   if(r.error){
+    // Si es un error de interacción requerida (usuario no logueado), no hacer nada en silent mode
+    if(r.error==='interaction_required'||r.error==='access_denied') return;
     toast('❌ Error Google: '+(r.error_description||r.error),'err');
     return;
   }
   googleAccessToken = r.access_token;
+  // Guardar token expiry para saber cuándo refrescar
+  googleTokenExpiry = Date.now() + (r.expires_in ? r.expires_in*1000 : 3500*1000);
+
   try{
     const info = await fetch('https://www.googleapis.com/oauth2/v3/userinfo',{
       headers:{ Authorization:'Bearer '+googleAccessToken }
@@ -2402,11 +2420,26 @@ async function onGoogleToken(r){
       S.currentUser.avatar = info.picture;
       await svU().catch(()=>{});
     }
+    // ── Guardar sesión en localStorage para reconexión automática ──
+    try{
+      localStorage.setItem('dv_google_session', JSON.stringify({
+        email: S.googleEmail,
+        name: S.googleName,
+        picture: info.picture||''
+      }));
+    }catch(e){}
   }catch(e){ console.error('Profile error:', e); }
 
   await ensureDriveFolders().catch(()=>{});
 
-  // Actualizar UI Settings
+  // Si la app no está visible aún, entrar directamente
+  const appEl=document.getElementById('app');
+  if(!appEl.classList.contains('visible')){
+    enterApp();
+    return;
+  }
+
+  // Actualizar UI Settings (ya estaba en la app)
   const gForm = document.getElementById('set-google-form');
   const gConn = document.getElementById('set-google-connected');
   if(gForm) gForm.style.display='none';
@@ -2417,14 +2450,26 @@ async function onGoogleToken(r){
   updateNavGoogleLabel(true);
   updateProfileUI();
   setSyncAll('ok');
-  toast('✅ Google conectado: '+S.googleEmail);
+  if(!window._silentRefresh) toast('✅ Google conectado: '+S.googleEmail);
+  window._silentRefresh=false;
 }
+
+// Refrescar token antes de que expire (cada 50 min)
+setInterval(()=>{
+  if(googleAccessToken && googleTokenExpiry && Date.now()>googleTokenExpiry-120000){
+    window._silentRefresh=true;
+    try{ googleTokenClient?.requestAccessToken({hint:S.googleEmail,prompt:''}); }catch(e){}
+  }
+},60000);
 
 function desconectarGoogle(){
   if(!confirm('¿Desconectar la cuenta Google?')) return;
   if(googleAccessToken && window.google) google.accounts.oauth2.revoke(googleAccessToken);
-  googleAccessToken=null; dvFolderId=null; photosFolderId=null;
+  googleAccessToken=null; googleTokenExpiry=null; dvFolderId=null; photosFolderId=null;
   S.googleEmail=''; S.googleName='';
+  // Borrar sesión guardada
+  try{ localStorage.removeItem('dv_google_session'); }catch(e){}
+  window._savedGoogleSession=null;
   updateProfileUI(); resetPills();
   document.getElementById('set-google-connected').style.display='none';
   document.getElementById('set-google-form').style.display='block';
@@ -2539,6 +2584,50 @@ const _origOpenUploadM = typeof openUploadM !== 'undefined' ? openUploadM : null
 
 // load handled below
 
+// ══ INSTANCIA ÚNICA ════════════════════════════════
+(function(){
+  const CH='docvault-instance';
+  const bc=new BroadcastChannel(CH);
+  // Avisar a otras tabs que ya hay una instancia
+  bc.onmessage=function(e){
+    if(e.data==='ping'){
+      bc.postMessage('alive');
+      // Si otra tab pide foco, traer esta al frente
+      window.focus();
+    }
+    if(e.data==='focus') window.focus();
+  };
+  // Preguntar si hay otra instancia abierta
+  bc.postMessage('ping');
+  const checkTimeout=setTimeout(()=>{
+    // Nadie respondió en 300ms → somos la única instancia
+    bc.close();
+    const bc2=new BroadcastChannel(CH);
+    bc2.onmessage=function(e){
+      if(e.data==='ping'){
+        // Hay otra tab intentando abrirse → la bloqueamos mostrando overlay
+        bc2.postMessage('alive');
+        window.focus();
+      }
+    };
+  },300);
+  bc.addEventListener('message',function handler(e){
+    if(e.data==='alive'){
+      clearTimeout(checkTimeout);
+      // Ya hay una instancia abierta — mostrar bloqueo
+      document.body.innerHTML=`
+        <div style="position:fixed;inset:0;background:#07090c;display:flex;flex-direction:column;align-items:center;justify-content:center;font-family:'Orbitron',monospace;z-index:99999">
+          <div style="font-size:52px;margin-bottom:24px">🔒</div>
+          <div style="font-size:18px;font-weight:900;color:#00D4AA;letter-spacing:4px;margin-bottom:12px">DOCVAULT PRO</div>
+          <div style="font-size:13px;color:#4e6575;letter-spacing:2px;margin-bottom:32px">YA HAY UNA INSTANCIA ABIERTA</div>
+          <button onclick="window.close()" style="background:linear-gradient(135deg,#00D4AA,#009e80);color:#000;border:none;padding:14px 32px;border-radius:4px;font-family:'Orbitron',monospace;font-size:11px;font-weight:900;letter-spacing:3px;cursor:pointer;margin-bottom:12px">CERRAR ESTA PESTAÑA</button>
+          <button onclick="(new BroadcastChannel('docvault-instance')).postMessage('focus');window.close()" style="background:transparent;border:1px solid rgba(0,212,170,0.3);color:#00D4AA;padding:10px 24px;border-radius:4px;font-family:'Orbitron',monospace;font-size:10px;letter-spacing:2px;cursor:pointer">IR A LA INSTANCIA ACTIVA</button>
+        </div>`;
+      bc.close();
+    }
+  });
+})();
+
 // ══ INIT ═══════════════════════════════════════════
 (async function(){
   // Ocultar login mientras carga
@@ -2550,16 +2639,13 @@ const _origOpenUploadM = typeof openUploadM !== 'undefined' ? openUploadM : null
     else{
       S.users=[{id:'u1',username:'admin',password:'admin123',role:'admin'}];
       S.folders=[{id:'f1',name:'Personal',icon:'🏠',access:'all'},{id:'f2',name:'Finanzas',icon:'💰',access:'admin'}];
-      // Mock storage para que no explote
       window.storage={get:async()=>null,set:async()=>null,delete:async()=>null,list:async()=>null};
     }
   }catch(err){
     console.error('Error cargando datos:', err);
-    // Fallback: usuario admin por defecto
     if(!S.users.length) S.users=[{id:'u1',username:'admin',password:'admin123',role:'admin'}];
   }
 
-  // Siempre garantizar que exista el admin
   if(!S.users.find(u=>u.id==='u1')){
     S.users.unshift({id:'u1',username:'admin',password:'admin123',role:'admin'});
     try{ await svU(); }catch(e){}
@@ -2568,6 +2654,23 @@ const _origOpenUploadM = typeof openUploadM !== 'undefined' ? openUploadM : null
   const n=new Date();n.setHours(n.getHours()+1,0,0,0);const e=new Date(n);e.setHours(e.getHours()+1);
   const evStart=document.getElementById('ev-start');const evEnd=document.getElementById('ev-end');
   if(evStart)evStart.value=toLocal(n);if(evEnd)evEnd.value=toLocal(e);
+
+  // ── Restaurar sesión Google guardada ─────────────
+  try{
+    const saved=localStorage.getItem('dv_google_session');
+    if(saved){
+      const sess=JSON.parse(saved);
+      // El token de Google dura 1h — si guardamos el email/nombre lo usamos
+      // y pedimos un token nuevo silenciosamente al cargar Google API
+      if(sess.email){
+        S.googleEmail=sess.email;
+        S.googleName=sess.name||sess.email.split('@')[0];
+        // Mostrar app directamente sin esperar token
+        // El token se refrescará automático cuando initGoogleAuth esté listo
+        window._savedGoogleSession=sess;
+      }
+    }
+  }catch(e){}
 
   // Mostrar login ya con datos listos
   if(authScreen){ authScreen.style.opacity=''; authScreen.style.transition='opacity .3s'; }
