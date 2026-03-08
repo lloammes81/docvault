@@ -556,8 +556,31 @@ select option{background:var(--bg3);}
 .nv-meta b{color:var(--text);}
 .nv-subject{font-size:17px;font-weight:700;color:var(--teal);margin-bottom:12px;font-family:'Orbitron',monospace;letter-spacing:1px;}
 .nv-body{font-size:13px;color:var(--text);line-height:1.7;white-space:pre-wrap;background:var(--bg4);border:1px solid var(--border);border-radius:4px;padding:14px 16px;}
+
+.sync-panel{margin-top:14px;padding:14px;border:1px solid var(--border);background:linear-gradient(180deg,var(--bg3),rgba(14,19,25,.92));border-radius:10px;box-shadow:var(--shadow-soft);}
+.sync-head{display:flex;justify-content:space-between;align-items:center;gap:10px;flex-wrap:wrap;margin-bottom:10px;}
+.sync-meta{font-size:10px;color:var(--text-dim);font-family:"Share Tech Mono",monospace;letter-spacing:.4px;}
+.sync-progress-wrap{height:14px;border-radius:999px;background:rgba(255,255,255,.05);border:1px solid rgba(255,255,255,.08);overflow:hidden;position:relative;}
+.sync-progress-bar{height:100%;width:0%;background:linear-gradient(90deg,var(--teal),var(--gold));box-shadow:0 0 18px rgba(0,212,170,.24);transition:width .28s ease;}
+.sync-progress-label{display:flex;justify-content:space-between;align-items:center;margin-top:7px;font-size:10px;color:var(--text-mid);font-family:"Share Tech Mono",monospace;}
+.sync-steps{margin-top:12px;display:grid;gap:8px;}
+.sync-step{display:grid;grid-template-columns:22px 1fr auto;gap:10px;align-items:center;padding:9px 10px;border-radius:8px;background:rgba(255,255,255,.025);border:1px solid rgba(255,255,255,.04);}
+.sync-step-icon{width:22px;height:22px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:11px;background:rgba(255,255,255,.05);border:1px solid rgba(255,255,255,.07);}
+.sync-step-name{font-size:12px;color:var(--text-light);font-weight:700;}
+.sync-step-sub{font-size:10px;color:var(--text-dim);margin-top:2px;}
+.sync-step-status{font-size:10px;font-weight:700;padding:4px 8px;border-radius:999px;border:1px solid rgba(255,255,255,.08);color:var(--text-mid);background:rgba(255,255,255,.03);}
+.sync-step.syncing .sync-step-status{color:var(--teal);border-color:rgba(0,212,170,.25);background:rgba(0,212,170,.08);}
+.sync-step.ok .sync-step-status{color:var(--green);border-color:rgba(30,215,96,.22);background:rgba(30,215,96,.08);}
+.sync-step.err .sync-step-status{color:var(--red);border-color:rgba(255,64,96,.22);background:rgba(255,64,96,.08);}
+.sync-log{margin-top:12px;max-height:170px;overflow:auto;padding:10px;border-radius:8px;background:#0a1118;border:1px solid rgba(255,255,255,.05);font-family:"Share Tech Mono",monospace;font-size:10px;color:#b9c9d8;line-height:1.55;}
+.sync-log-line{margin-bottom:6px;white-space:pre-wrap;}
+.sync-log-line.ok{color:#9ef0b8;}
+.sync-log-line.err{color:#ff8ca4;}
+.sync-log-line.run{color:#71f3da;}
+
 </style>
-<script src="https://accounts.google.com/gsi/client" async defer></script>
+<script src="https://accounts.google.com/gsi/client" async defer>
+</script>
 </head>
 <body>
 
@@ -798,7 +821,25 @@ select option{background:var(--bg3);}
             <div class="set-row"><div class="sr-l"><div class="sr-title">Google Contacts</div><div class="sr-sub">Búsqueda y selección de contactos</div></div><div style="display:flex;gap:7px;align-items:center"><div id="set-cont" class="sync-pill idle"><div class="sp-dot"></div>Sin sincronizar</div><button class="btn btn-ghost" style="font-size:10px;padding:5px 9px" onclick="testCont()">Probar</button></div></div>
             <div style="margin-top:14px;display:flex;align-items:center;gap:12px;flex-wrap:wrap">
               <button class="btn btn-solid" onclick="testAll()">⚡ Verificar Todas</button>
+              <button class="btn btn-g" onclick="syncAllGoogleData()">🔄 Sincronizar Todo</button>
               <span id="last-sync" style="font-size:10px;color:var(--text-dim);font-family:'Share Tech Mono',monospace"></span>
+            </div>
+            <div class="sync-panel">
+              <div class="sync-head">
+                <div>
+                  <div class="sr-title">Sincronización completa</div>
+                  <div class="sr-sub">Carga Gmail, Contactos y Calendar mostrando el avance en vivo.</div>
+                </div>
+                <div id="sync-summary" class="sync-meta">Esperando sincronización manual</div>
+              </div>
+              <div class="sync-progress-wrap"><div id="sync-progress-bar" class="sync-progress-bar"></div></div>
+              <div class="sync-progress-label"><span id="sync-progress-text">0%</span><span id="sync-progress-detail">Listo para iniciar</span></div>
+              <div class="sync-steps" id="sync-steps">
+                <div class="sync-step" id="sync-step-gmail"><div class="sync-step-icon">✉️</div><div><div class="sync-step-name">Gmail</div><div class="sync-step-sub">Correos primarios sin spam</div></div><div class="sync-step-status">Pendiente</div></div>
+                <div class="sync-step" id="sync-step-contacts"><div class="sync-step-icon">👤</div><div><div class="sync-step-name">Contactos</div><div class="sync-step-sub">Directorio de Google Contacts</div></div><div class="sync-step-status">Pendiente</div></div>
+                <div class="sync-step" id="sync-step-calendar"><div class="sync-step-icon">📅</div><div><div class="sync-step-name">Calendario</div><div class="sync-step-sub">Próximos eventos y agenda</div></div><div class="sync-step-status">Pendiente</div></div>
+              </div>
+              <div id="sync-log" class="sync-log"><div class="sync-log-line">[listo] panel de sincronización preparado</div></div>
             </div>
           </div>
           <!-- Credentials -->
@@ -1358,6 +1399,83 @@ async function testAll(){
   const ok=g&&c&&co;setPill('gc-status',ok?'ok':'err',ok?'Todo OK':'Algunas fallas');
   if(lbl)lbl.textContent='Última verificación: '+new Date().toLocaleTimeString('es-MX');
   toast(ok?'✅ Todas las conexiones OK':'⚠ Algunas conexiones fallaron',ok?'ok':'warn');
+}
+
+const SYNC_STEP_META={gmail:{id:'sync-step-gmail',label:'Gmail'},contacts:{id:'sync-step-contacts',label:'Contactos'},calendar:{id:'sync-step-calendar',label:'Calendario'}};
+let syncRunning=false;
+function syncEl(id){return document.getElementById(id)}
+function resetSyncPanel(){
+  Object.values(SYNC_STEP_META).forEach(({id})=>{
+    const el=syncEl(id); if(!el) return; el.classList.remove('syncing','ok','err');
+    const st=el.querySelector('.sync-step-status'); if(st) st.textContent='Pendiente';
+  });
+  const bar=syncEl('sync-progress-bar'); if(bar) bar.style.width='0%';
+  const txt=syncEl('sync-progress-text'); if(txt) txt.textContent='0%';
+  const det=syncEl('sync-progress-detail'); if(det) det.textContent='Listo para iniciar';
+  const sum=syncEl('sync-summary'); if(sum) sum.textContent='Esperando sincronización manual';
+  const log=syncEl('sync-log'); if(log) log.innerHTML='<div class="sync-log-line">[listo] panel de sincronización preparado</div>';
+}
+function addSyncLog(message,type=''){
+  const log=syncEl('sync-log'); if(!log) return;
+  const line=document.createElement('div');
+  line.className='sync-log-line'+(type?' '+type:'');
+  const stamp=new Date().toLocaleTimeString('es-MX',{hour:'2-digit',minute:'2-digit',second:'2-digit'});
+  line.textContent=`[${stamp}] ${message}`;
+  log.appendChild(line); log.scrollTop=log.scrollHeight;
+}
+function updateSyncProgress(done,total,detail=''){
+  const pct=Math.max(0,Math.min(100,Math.round((done/total)*100)));
+  const bar=syncEl('sync-progress-bar'); if(bar) bar.style.width=pct+'%';
+  const txt=syncEl('sync-progress-text'); if(txt) txt.textContent=pct+'%';
+  const det=syncEl('sync-progress-detail'); if(det) det.textContent=detail || `${done}/${total} completado`;
+  const sum=syncEl('sync-summary'); if(sum) sum.textContent=`${done}/${total} módulos procesados`;
+}
+function setSyncStep(step,state,label){
+  const meta=SYNC_STEP_META[step]; if(!meta) return;
+  const el=syncEl(meta.id); if(!el) return;
+  el.classList.remove('syncing','ok','err'); if(state) el.classList.add(state);
+  const st=el.querySelector('.sync-step-status'); if(st) st.textContent=label || (state==='syncing'?'Sincronizando':state==='ok'?'Completado':state==='err'?'Error':'Pendiente');
+}
+async function syncAllGoogleData(){
+  if(syncRunning){ toast('Ya hay una sincronización en progreso','warn'); return; }
+  syncRunning=true;
+  const total=3; let done=0; let okCount=0;
+  const lbl=syncEl('last-sync');
+  resetSyncPanel();
+  if(lbl) lbl.textContent='Sincronizando...';
+  setPill('gc-status','syncing','Sincronizando...');
+  addSyncLog('Iniciando sincronización completa de Google','run');
+  const steps=[
+    {key:'gmail', start:'Cargando Gmail primario...', ok:'Gmail cargado', err:'Error al cargar Gmail', run:async()=>{await loadInbox(); const count=(document.querySelectorAll('#email-area .email-it')||[]).length; return `${count} correos cargados`; }},
+    {key:'contacts', start:'Cargando Google Contacts...', ok:'Contactos cargados', err:'Error al cargar contactos', run:async()=>{await loadAllContacts(); const count=(document.querySelectorAll('#cont-area .contact-card')||[]).length; return `${count} contactos cargados`; }},
+    {key:'calendar', start:'Cargando Google Calendar...', ok:'Calendario cargado', err:'Error al cargar calendario', run:async()=>{await loadCalEvents(); const count=Array.isArray(S.calEvents)?S.calEvents.length:0; return `${count} eventos cargados`; }}
+  ];
+  try{
+    for(const step of steps){
+      setSyncStep(step.key,'syncing','Sincronizando...');
+      updateSyncProgress(done,total,step.start);
+      addSyncLog(step.start,'run');
+      try{
+        const detail=await step.run();
+        done++; okCount++;
+        setSyncStep(step.key,'ok',detail);
+        updateSyncProgress(done,total,detail);
+        addSyncLog(`${step.ok}: ${detail}`,'ok');
+      }catch(err){
+        done++;
+        const msg=err?.message||'Error desconocido';
+        setSyncStep(step.key,'err','Falló');
+        updateSyncProgress(done,total,`${step.err}: ${msg}`);
+        addSyncLog(`${step.err}: ${msg}`,'err');
+      }
+    }
+    const allOk=okCount===total;
+    setPill('gc-status',allOk?'ok':'err',allOk?'Sincronizado ✓':'Sincronización parcial');
+    if(lbl) lbl.textContent='Última sincronización: '+new Date().toLocaleTimeString('es-MX');
+    const sum=syncEl('sync-summary'); if(sum) sum.textContent=allOk?'Sincronización completada correctamente':'Sincronización completada con incidencias';
+    addSyncLog(allOk?'Proceso finalizado sin errores':'Proceso finalizado con incidencias',allOk?'ok':'err');
+    toast(allOk?'Sincronización completa ✓':'Sincronización parcial',allOk?'ok':'warn');
+  }finally{ syncRunning=false; }
 }
 
 // ══ MODULES ════════════════════════════════════════
