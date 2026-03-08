@@ -1444,7 +1444,7 @@ async function sendEmail(){
 
 async function loadInbox(){
   const area=document.getElementById('email-area');area.innerHTML=thinking('Cargando bandeja...');setPill(['gmail-pill','set-gmail'],'syncing','Cargando...');
-  try{const data=await callAI('List 15 most recent Gmail inbox emails. Return JSON array: [{from_name,from_email,subject,date,preview,has_attachment}]. ONLY JSON, no markdown.','Use Gmail tools.',GMAIL);let txt=(getText(data)||getMcp(data)).replace(/```json|```/g,'').trim();let emails=[];try{emails=JSON.parse(txt);}catch{}
+  try{const data=await callAI('List 15 most recent primary Gmail inbox emails only. Exclude spam, trash, promotions, social, updates, forums, and drafts. Return ONLY a JSON array: [{from_name,from_email,subject,date,preview,has_attachment}]. No markdown.','Use Gmail tools.',GMAIL);let txt=(getText(data)||getMcp(data)).replace(/```json|```/g,'').trim();let emails=[];try{emails=JSON.parse(txt);}catch{}
   if(!emails.length){area.innerHTML='<div class="empty-state"><div class="e-ico">📭</div><p>Sin correos</p></div>';setPill(['gmail-pill','set-gmail'],'ok','Gmail ✓');return;}
   setPill(['gmail-pill','set-gmail'],'ok',`Gmail — ${emails.length} correos`);
   document.getElementById('gmail-crumb').textContent=`Bandeja — ${emails.length} correos`;
@@ -1457,19 +1457,19 @@ async function loadSent(){
   area.innerHTML=`<div class="email-list">${emails.map(em=>`<div class="email-it"><div class="em-av" style="background:var(--bg5);color:var(--gold)">→</div><div class="em-body"><div class="em-from">Para: ${em.to_email||''}</div><div class="em-subject">${em.subject||'(sin asunto)'}</div><div class="em-preview">${em.preview||''}</div></div><div class="em-meta"><div class="em-time">${em.date||''}</div></div></div>`).join('')}</div>`;}
   catch(e){area.innerHTML=`<div class="empty-state"><div class="e-ico">⚠️</div><p>${e.message}</p></div>`;}
 }
-async function searchEmails(){const q=document.getElementById('email-search').value.trim();if(!q)return toast('Escribe algo','warn');const area=document.getElementById('email-area');area.innerHTML=thinking(`Buscando "${q}"...`);try{const data=await callAI(`Search Gmail for: "${q}". Return JSON: [{from_name,from_email,subject,date,preview}].`,'Use Gmail tools.',GMAIL);let txt=(getText(data)||getMcp(data)).replace(/```json|```/g,'').trim();let emails=[];try{emails=JSON.parse(txt);}catch{}area.innerHTML=emails.length?`<div class="email-list">${emails.map(em=>`<div class="email-it"><div class="em-av">${(em.from_name||'?')[0].toUpperCase()}</div><div class="em-body"><div class="em-from">${em.from_name||em.from_email}</div><div class="em-subject">${em.subject}</div><div class="em-preview">${em.preview||''}</div></div><div class="em-meta"><div class="em-time">${em.date}</div></div></div>`).join('')}</div>`:'<div class="empty-state"><div class="e-ico">🔍</div><p>Sin resultados</p></div>';}catch(e){area.innerHTML=`<div class="empty-state"><div class="e-ico">⚠️</div><p>${e.message}</p></div>`;}}
+async function searchEmails(){const q=document.getElementById('email-search').value.trim();if(!q)return toast('Escribe algo','warn');const area=document.getElementById('email-area');area.innerHTML=thinking(`Buscando "${q}"...`);try{const data=await callAI(`Search Gmail inbox for: "${q}". Exclude spam, trash, promotions, social, updates, forums, and drafts. Return ONLY JSON: [{from_name,from_email,subject,date,preview}].`,'Use Gmail tools.',GMAIL);let txt=(getText(data)||getMcp(data)).replace(/```json|```/g,'').trim();let emails=[];try{emails=JSON.parse(txt);}catch{}area.innerHTML=emails.length?`<div class="email-list">${emails.map(em=>`<div class="email-it"><div class="em-av">${(em.from_name||'?')[0].toUpperCase()}</div><div class="em-body"><div class="em-from">${em.from_name||em.from_email}</div><div class="em-subject">${em.subject}</div><div class="em-preview">${em.preview||''}</div></div><div class="em-meta"><div class="em-time">${em.date}</div></div></div>`).join('')}</div>`:'<div class="empty-state"><div class="e-ico">🔍</div><p>Sin resultados</p></div>';}catch(e){area.innerHTML=`<div class="empty-state"><div class="e-ico">⚠️</div><p>${e.message}</p></div>`;}}
 function replyTo(email,subj){document.getElementById('em-to').value=email;document.getElementById('em-subj').value=subj.startsWith('Re:')?subj:'Re: '+subj;openM('m-compose');}
 
 // ══ CONTACTS ═══════════════════════════════════════
 async function searchContacts(){
   const q=document.getElementById('cont-search').value.trim();if(!q)return loadAllContacts();
   const area=document.getElementById('cont-area');area.innerHTML=thinking(`Buscando "${q}"...`);setPill('cont-pill','syncing');
-  try{const data=await callAI(`Search Gmail contacts for: "${q}". Return JSON: [{name,email,phone,company}]. Max 15.`,'Use Gmail tools.',GMAIL);let txt=(getText(data)||getMcp(data)).replace(/```json|```/g,'').trim();let cs=[];try{cs=JSON.parse(txt);}catch{}setPill('cont-pill','ok',`Contacts — ${cs.length}`);document.getElementById('cont-status').textContent=cs.length+' resultado(s)';renderContactCards(cs,area);}
+  try{const data=await callAI(`Search Google Contacts for: "${q}". Return ONLY JSON: [{name,email,phone,company}]. Max 15.`,'Use Gmail tools.',GMAIL);let txt=(getText(data)||getMcp(data)).replace(/```json|```/g,'').trim();let cs=[];try{cs=JSON.parse(txt);}catch{}setPill('cont-pill','ok',`Contacts — ${cs.length}`);document.getElementById('cont-status').textContent=cs.length+' resultado(s)';renderContactCards(cs,area);}
   catch(e){area.innerHTML=`<div class="empty-state"><div class="e-ico">⚠️</div><p>${e.message}</p></div>`;setPill('cont-pill','err','Error');}
 }
 async function loadAllContacts(){
   const area=document.getElementById('cont-area');area.innerHTML=thinking('Cargando contactos...');setPill('cont-pill','syncing');
-  try{const data=await callAI('List my 20 most frequent Gmail contacts. Return JSON: [{name,email,phone,company}].','Use Gmail tools.',GMAIL);let txt=(getText(data)||getMcp(data)).replace(/```json|```/g,'').trim();let cs=[];try{cs=JSON.parse(txt);}catch{}setPill('cont-pill','ok',`${cs.length} contactos`);document.getElementById('cont-status').textContent=cs.length+' contacto(s)';renderContactCards(cs,area);}
+  try{const data=await callAI('List my first 50 Google Contacts. Return ONLY JSON: [{name,email,phone,company}].','Use Gmail tools.',GMAIL);let txt=(getText(data)||getMcp(data)).replace(/```json|```/g,'').trim();let cs=[];try{cs=JSON.parse(txt);}catch{}setPill('cont-pill','ok',`${cs.length} contactos`);document.getElementById('cont-status').textContent=cs.length+' contacto(s)';renderContactCards(cs,area);}
   catch(e){area.innerHTML=`<div class="empty-state"><div class="e-ico">⚠️</div><p>${e.message}</p></div>`;setPill('cont-pill','err','Error');}
 }
 function renderContactCards(cs,area){area.innerHTML=cs.length?cs.map(c=>`<div class="contact-card"><div class="c-av">${(c.name||c.email||'?')[0].toUpperCase()}</div><div class="c-info"><div class="c-name">${c.name||'Sin nombre'}</div><div class="c-email">✉ ${c.email||'—'}</div>${c.phone?`<div class="c-phone">📞 ${c.phone}</div>`:''}${c.company?`<div class="c-phone">🏢 ${c.company}</div>`:''}</div><div class="c-actions"><button class="btn btn-t" style="font-size:10px;padding:5px 9px" onclick="composeToContact('${escA(c.email||'')}')">✉ Escribir</button><button class="btn btn-ghost" style="font-size:10px;padding:5px 9px" onclick="scheduleWith('${escA(c.email||'')}','${escA(c.name||'')}')">📅 Cita</button></div></div>`).join(''):'<div class="empty-state"><div class="e-ico">👤</div><p>Sin contactos</p></div>';}
@@ -1478,7 +1478,7 @@ function scheduleWith(email,name){document.getElementById('ev-att').value=email;
 
 // Contact picker
 function openCPicker(inputId){S.cpTarget=inputId;document.getElementById('cp-q').value='';document.getElementById('cp-res').innerHTML='<p style="color:var(--text-dim);font-size:12px">Escribe para buscar en Google Contacts.</p>';openM('m-cpicker');}
-async function pickSearch(){const q=document.getElementById('cp-q').value.trim();if(!q)return;document.getElementById('cp-res').innerHTML=thinking('Buscando...');try{const data=await callAI(`Search Gmail contacts for: "${q}". Return JSON: [{name,email}]. Max 8.`,'Use Gmail tools.',GMAIL);let txt=(getText(data)||getMcp(data)).replace(/```json|```/g,'').trim();let cs=[];try{cs=JSON.parse(txt);}catch{}document.getElementById('cp-res').innerHTML=cs.length?cs.map(c=>`<div class="contact-card" style="cursor:pointer" onclick="selContact('${escA(c.email||'')}')"><div class="c-av" style="width:32px;height:32px;font-size:11px">${(c.name||'?')[0].toUpperCase()}</div><div class="c-info"><div class="c-name" style="font-size:13px">${c.name||''}</div><div class="c-email">${c.email||''}</div></div><button class="btn btn-t" style="font-size:10px;padding:4px 8px">Seleccionar</button></div>`).join(''):'<p style="color:var(--text-dim);font-size:12px">Sin resultados</p>';}catch(e){document.getElementById('cp-res').innerHTML=`<p style="color:var(--red);font-size:11px">Error: ${e.message}</p>`;}}
+async function pickSearch(){const q=document.getElementById('cp-q').value.trim();if(!q)return;document.getElementById('cp-res').innerHTML=thinking('Buscando...');try{const data=await callAI(`Search Google Contacts for: "${q}". Return ONLY JSON: [{name,email}]. Max 8.`,'Use Gmail tools.',GMAIL);let txt=(getText(data)||getMcp(data)).replace(/```json|```/g,'').trim();let cs=[];try{cs=JSON.parse(txt);}catch{}document.getElementById('cp-res').innerHTML=cs.length?cs.map(c=>`<div class="contact-card" style="cursor:pointer" onclick="selContact('${escA(c.email||'')}')"><div class="c-av" style="width:32px;height:32px;font-size:11px">${(c.name||'?')[0].toUpperCase()}</div><div class="c-info"><div class="c-name" style="font-size:13px">${c.name||''}</div><div class="c-email">${c.email||''}</div></div><button class="btn btn-t" style="font-size:10px;padding:4px 8px">Seleccionar</button></div>`).join(''):'<p style="color:var(--text-dim);font-size:12px">Sin resultados</p>';}catch(e){document.getElementById('cp-res').innerHTML=`<p style="color:var(--red);font-size:11px">Error: ${e.message}</p>`;}}
 function selContact(email){const inp=document.getElementById(S.cpTarget);if(inp){if(inp.value&&!inp.value.endsWith(',')&&inp.value.trim())inp.value+=', ';inp.value+=email;}closeM('m-cpicker');toast(email+' seleccionado ✓');}
 
 // ══ CALENDAR ═══════════════════════════════════════
@@ -1752,9 +1752,9 @@ function toast(msg,type='ok'){clearTimeout(_tt);document.querySelectorAll('.toas
 // ══ GOOGLE OAUTH 2.0 + DRIVE ══════════════════════
 const GOOGLE_CLIENT_ID = '866504705025-4ks5aefv888jvkdm0uag6i89evjgdems.apps.googleusercontent.com';
 const GOOGLE_SCOPES = [
-  'email','profile',
-  'https://www.googleapis.com/auth/gmail.modify',
-  'https://www.googleapis.com/auth/calendar',
+  'openid','email','profile',
+  'https://www.googleapis.com/auth/gmail.readonly',
+  'https://www.googleapis.com/auth/calendar.readonly',
   'https://www.googleapis.com/auth/contacts.readonly',
   'https://www.googleapis.com/auth/drive.file'
 ].join(' ');
@@ -1817,6 +1817,17 @@ async function onGoogleToken(r){
   updateProfileUI();
   setSyncAll('ok');
   toast('✅ Google conectado: '+S.googleEmail);
+
+  try{
+    await Promise.allSettled([
+      loadInbox(),
+      loadAllContacts(),
+      loadCalEvents()
+    ]);
+    toast('Google sincronizado ✓');
+  }catch(e){
+    console.error('Post-login sync error:', e);
+  }
 }
 
 function desconectarGoogle(){
