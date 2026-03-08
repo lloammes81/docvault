@@ -1510,29 +1510,54 @@ async function loadInbox(){
   const area=document.getElementById('email-area');area.innerHTML=thinking('Cargando bandeja...');setPill(['gmail-pill','set-gmail'],'syncing','Cargando...');
   if(!googleAccessToken){area.innerHTML='<div class="empty-state"><div class="e-ico">🔑</div><p>Conecta tu cuenta Google primero</p></div>';setPill(['gmail-pill','set-gmail'],'err','Sin conexión');return;}
   try{
-    const listRes=await fetch('https://gmail.googleapis.com/gmail/v1/users/me/messages?maxResults=15&labelIds=INBOX',{headers:{Authorization:'Bearer '+googleAccessToken}});
+    // Excluye spam, promociones, categorías sociales y notificaciones
+    const q=encodeURIComponent('-category:promotions -category:social -category:updates -category:forums -in:spam');
+    const listRes=await fetch(`https://gmail.googleapis.com/gmail/v1/users/me/messages?maxResults=30&labelIds=INBOX&q=${q}`,{headers:{Authorization:'Bearer '+googleAccessToken}});
     const listData=await listRes.json();
-    if(!listData.messages||!listData.messages.length){area.innerHTML='<div class="empty-state"><div class="e-ico">📭</div><p>Sin correos</p></div>';setPill(['gmail-pill','set-gmail'],'ok','Gmail ✓');return;}
+    if(!listData.messages||!listData.messages.length){area.innerHTML='<div class="empty-state"><div class="e-ico">📭</div><p>Bandeja vacía</p></div>';setPill(['gmail-pill','set-gmail'],'ok','Gmail ✓');return;}
     const emails=await Promise.all(listData.messages.map(async m=>{
       const r=await fetch(`https://gmail.googleapis.com/gmail/v1/users/me/messages/${m.id}?format=metadata&metadataHeaders=From&metadataHeaders=Subject&metadataHeaders=Date`,{headers:{Authorization:'Bearer '+googleAccessToken}});
       const d=await r.json();
       const hdrs=d.payload?.headers||[];
       const get=n=>hdrs.find(h=>h.name===n)?.value||'';
-      const from=get('From');const fromName=from.replace(/<.*>/,'').replace(/"/g,'').trim()||from;const fromEmail=(from.match(/<(.+?)>/)||[,''])[1]||from;
-      const hasAtt=d.payload?.parts?.some(p=>p.filename&&p.filename.length>0)||false;
+      const from=get('From');
+      const fromName=from.replace(/<[^>]+>/,'').replace(/"/g,'').trim()||from;
+      const fromEmail=(from.match(/<([^>]+)>/)||[,''])[1]||from;
+      const labelIds=d.labelIds||[];
+      const isUnread=labelIds.includes('UNREAD');
+      const hasAtt=(d.payload?.parts||[]).some(p=>p.filename&&p.filename.length>0);
       const snippet=d.snippet||'';
-      return{from_name:fromName,from_email:fromEmail,subject:get('Subject')||'(sin asunto)',date:new Date(parseInt(d.internalDate)).toLocaleDateString('es-ES',{day:'numeric',month:'short',hour:'2-digit',minute:'2-digit'}),preview:snippet.substring(0,100),has_attachment:hasAtt};
+      return{id:m.id,from_name:fromName,from_email:fromEmail,subject:get('Subject')||'(sin asunto)',date:new Date(parseInt(d.internalDate)).toLocaleDateString('es-ES',{day:'numeric',month:'short',hour:'2-digit',minute:'2-digit'}),preview:snippet.substring(0,120),has_attachment:hasAtt,unread:isUnread};
     }));
     setPill(['gmail-pill','set-gmail'],'ok',`Gmail — ${emails.length} correos`);
     document.getElementById('gmail-crumb').textContent=`Bandeja — ${emails.length} correos`;
-    area.innerHTML=`<div class="email-list">${emails.map(em=>`<div class="email-it"><div class="em-av">${(em.from_name||em.from_email||'?')[0].toUpperCase()}</div><div class="em-body"><div class="em-from">${em.from_name||em.from_email}</div><div class="em-subject">${em.subject}</div><div class="em-preview">${em.preview}</div></div><div class="em-meta"><div class="em-time">${em.date}</div>${em.has_attachment?'<span style="font-size:10px;color:var(--gold)">📎</span>':''}<button class="btn btn-ghost" style="font-size:9px;padding:2px 7px" onclick="replyTo('${escA(em.from_email||'')}','${escA(em.subject||'')}')">↩</button></div></div>`).join('')}</div>`;
+    area.innerHTML=`<div class="email-list">${emails.map(em=>{
+      const av=(em.from_name||em.from_email||'?')[0].toUpperCase();
+      const unreadStyle=em.unread?'border-left:2px solid var(--teal);':'';
+      const nameStyle=em.unread?'color:var(--text);font-weight:800;':'';
+      const subjStyle=em.unread?'color:var(--text);font-weight:700;':'';
+      return `<div class="email-it" style="${unreadStyle}">
+        <div class="em-av" style="background:${em.unread?'var(--teal-bg)':'var(--bg5)'}">${av}</div>
+        <div class="em-body">
+          <div class="em-from" style="${nameStyle}">${escH(em.from_name||em.from_email)}</div>
+          <div class="em-subject" style="${subjStyle}">${escH(em.subject)}</div>
+          <div class="em-preview">${escH(em.preview)}</div>
+        </div>
+        <div class="em-meta">
+          <div class="em-time">${em.date}</div>
+          ${em.has_attachment?'<span style="font-size:10px;color:var(--gold)">📎</span>':''}
+          ${em.unread?'<span style="font-size:8px;background:var(--teal);color:#000;border-radius:8px;padding:1px 5px;font-weight:800">NEW</span>':''}
+          <button class="btn btn-ghost" style="font-size:9px;padding:2px 7px" onclick="replyTo('${escA(em.from_email||'')}','${escA(em.subject||'')}')">↩</button>
+        </div>
+      </div>`;
+    }).join('')}</div>`;
   }catch(e){area.innerHTML=`<div class="empty-state"><div class="e-ico">⚠️</div><p>${e.message}</p></div>`;setPill(['gmail-pill','set-gmail'],'err','Error Gmail');}
 }
 async function loadSent(){
   const area=document.getElementById('email-area');area.innerHTML=thinking('Cargando enviados...');
   if(!googleAccessToken){area.innerHTML='<div class="empty-state"><div class="e-ico">🔑</div><p>Conecta tu cuenta Google primero</p></div>';return;}
   try{
-    const listRes=await fetch('https://gmail.googleapis.com/gmail/v1/users/me/messages?maxResults=10&labelIds=SENT',{headers:{Authorization:'Bearer '+googleAccessToken}});
+    const listRes=await fetch('https://gmail.googleapis.com/gmail/v1/users/me/messages?maxResults=20&labelIds=SENT',{headers:{Authorization:'Bearer '+googleAccessToken}});
     const listData=await listRes.json();
     if(!listData.messages||!listData.messages.length){area.innerHTML='<div class="empty-state"><div class="e-ico">📤</div><p>Sin enviados</p></div>';return;}
     const emails=await Promise.all(listData.messages.map(async m=>{
@@ -1540,9 +1565,20 @@ async function loadSent(){
       const d=await r.json();
       const hdrs=d.payload?.headers||[];
       const get=n=>hdrs.find(h=>h.name===n)?.value||'';
-      return{to_email:get('To'),subject:get('Subject')||'(sin asunto)',date:new Date(parseInt(d.internalDate)).toLocaleDateString('es-ES',{day:'numeric',month:'short',hour:'2-digit',minute:'2-digit'}),preview:(d.snippet||'').substring(0,100)};
+      const to=get('To');
+      const toName=to.replace(/<[^>]+>/,'').replace(/"/g,'').trim()||to;
+      return{to_name:toName,to_email:to,subject:get('Subject')||'(sin asunto)',date:new Date(parseInt(d.internalDate)).toLocaleDateString('es-ES',{day:'numeric',month:'short',hour:'2-digit',minute:'2-digit'}),preview:(d.snippet||'').substring(0,120)};
     }));
-    area.innerHTML=`<div class="email-list">${emails.map(em=>`<div class="email-it"><div class="em-av" style="background:var(--bg5);color:var(--gold)">→</div><div class="em-body"><div class="em-from">Para: ${em.to_email}</div><div class="em-subject">${em.subject}</div><div class="em-preview">${em.preview}</div></div><div class="em-meta"><div class="em-time">${em.date}</div></div></div>`).join('')}</div>`;
+    area.innerHTML=`<div class="email-list">${emails.map(em=>`
+      <div class="email-it">
+        <div class="em-av" style="background:var(--bg5);color:var(--gold);font-size:16px;">→</div>
+        <div class="em-body">
+          <div class="em-from" style="color:var(--text-mid)">Para: ${escH(em.to_name||em.to_email)}</div>
+          <div class="em-subject">${escH(em.subject)}</div>
+          <div class="em-preview">${escH(em.preview)}</div>
+        </div>
+        <div class="em-meta"><div class="em-time">${em.date}</div></div>
+      </div>`).join('')}</div>`;
   }catch(e){area.innerHTML=`<div class="empty-state"><div class="e-ico">⚠️</div><p>${e.message}</p></div>`;}
 }
 async function searchEmails(){
@@ -1582,13 +1618,49 @@ async function loadAllContacts(){
   const area=document.getElementById('cont-area');area.innerHTML=thinking('Cargando contactos...');setPill('cont-pill','syncing');
   if(!googleAccessToken){area.innerHTML='<div class="empty-state"><div class="e-ico">🔑</div><p>Conecta tu cuenta Google primero</p></div>';setPill('cont-pill','err','Sin conexión');return;}
   try{
-    const res=await fetch('https://people.googleapis.com/v1/people/me/connections?pageSize=30&sortOrder=LAST_MODIFIED_DESCENDING&personFields=names,emailAddresses,phoneNumbers,organizations',{headers:{Authorization:'Bearer '+googleAccessToken}});
+    // Cargar conexiones del usuario (contactos reales, no directorios)
+    const res=await fetch('https://people.googleapis.com/v1/people/me/connections?pageSize=100&sortOrder=LAST_MODIFIED_DESCENDING&personFields=names,emailAddresses,phoneNumbers,organizations,photos',{headers:{Authorization:'Bearer '+googleAccessToken}});
     const d=await res.json();
-    const cs=(d.connections||[]).map(p=>({name:p.names?.[0]?.displayName||'',email:p.emailAddresses?.[0]?.value||'',phone:p.phoneNumbers?.[0]?.value||'',company:p.organizations?.[0]?.name||''})).filter(c=>c.name||c.email);
-    setPill('cont-pill','ok',`${cs.length} contactos`);document.getElementById('cont-status').textContent=cs.length+' contacto(s)';renderContactCards(cs,area);
+    if(d.error)throw new Error(d.error.message);
+    // Filtrar solo contactos con nombre o email válido
+    const cs=(d.connections||[])
+      .map(p=>({
+        name:p.names?.[0]?.displayName||'',
+        email:p.emailAddresses?.[0]?.value||'',
+        phone:p.phoneNumbers?.[0]?.value||'',
+        company:p.organizations?.[0]?.name||'',
+        photo:p.photos?.[0]?.url||''
+      }))
+      .filter(c=>(c.name||c.email)&&c.email) // solo con email
+      .sort((a,b)=>a.name.localeCompare(b.name,'es'));
+    setPill('cont-pill','ok',`${cs.length} contactos`);
+    document.getElementById('cont-status').textContent=cs.length+' contacto(s)';
+    renderContactCards(cs,area);
   }catch(e){area.innerHTML=`<div class="empty-state"><div class="e-ico">⚠️</div><p>${e.message}</p></div>`;setPill('cont-pill','err','Error');}
 }
-function renderContactCards(cs,area){area.innerHTML=cs.length?cs.map(c=>`<div class="contact-card"><div class="c-av">${(c.name||c.email||'?')[0].toUpperCase()}</div><div class="c-info"><div class="c-name">${c.name||'Sin nombre'}</div><div class="c-email">✉ ${c.email||'—'}</div>${c.phone?`<div class="c-phone">📞 ${c.phone}</div>`:''}${c.company?`<div class="c-phone">🏢 ${c.company}</div>`:''}</div><div class="c-actions"><button class="btn btn-t" style="font-size:10px;padding:5px 9px" onclick="composeToContact('${escA(c.email||'')}')">✉ Escribir</button><button class="btn btn-ghost" style="font-size:10px;padding:5px 9px" onclick="scheduleWith('${escA(c.email||'')}','${escA(c.name||'')}')">📅 Cita</button></div></div>`).join(''):'<div class="empty-state"><div class="e-ico">👤</div><p>Sin contactos</p></div>';}
+function renderContactCards(cs,area){
+  if(!cs.length){area.innerHTML='<div class="empty-state"><div class="e-ico">👤</div><p>Sin contactos</p></div>';return;}
+  area.innerHTML=cs.map(c=>{
+    const initials=(c.name||c.email||'?').split(' ').map(w=>w[0]).join('').substring(0,2).toUpperCase();
+    const avEl=c.photo
+      ? `<img src="${escA(c.photo)}" style="width:38px;height:38px;border-radius:50%;object-fit:cover;flex-shrink:0;" onerror="this.style.display='none';this.nextElementSibling.style.display='flex'">`
+      + `<div class="c-av" style="display:none">${initials}</div>`
+      : `<div class="c-av">${initials}</div>`;
+    return `<div class="contact-card">
+      ${avEl}
+      <div class="c-info">
+        <div class="c-name">${escH(c.name||'Sin nombre')}</div>
+        <div class="c-email">✉ ${escH(c.email||'—')}</div>
+        ${c.phone?`<div class="c-phone">📞 ${escH(c.phone)}</div>`:''}
+        ${c.company?`<div class="c-phone">🏢 ${escH(c.company)}</div>`:''}
+      </div>
+      <div class="c-actions">
+        <button class="btn btn-t" style="font-size:10px;padding:5px 9px" onclick="composeToContact('${escA(c.email||'')}')">✉ Escribir</button>
+        <button class="btn btn-ghost" style="font-size:10px;padding:5px 9px" onclick="scheduleWith('${escA(c.email||'')}','${escA(c.name||'')}')">📅 Cita</button>
+      </div>
+    </div>`;
+  }).join('');
+}
 function composeToContact(e){document.getElementById('em-to').value=e;switchMod('email');openCompose();}
 function scheduleWith(email,name){document.getElementById('ev-att').value=email;document.getElementById('ev-title').value=name?`Reunión con ${name}`:'';const n=new Date();n.setHours(n.getHours()+1,0,0,0);const e2=new Date(n);e2.setHours(e2.getHours()+1);document.getElementById('ev-start').value=toLocal(n);document.getElementById('ev-end').value=toLocal(e2);switchMod('calendar');openEventM();}
 
