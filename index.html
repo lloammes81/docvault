@@ -693,19 +693,31 @@ select option{background:var(--bg3);}
         <div id="gmail-pill" class="sync-pill idle"><div class="sp-dot"></div>Sin sincronizar</div>
       </div>
       <div style="display:flex;flex:1;overflow:hidden">
-        <div class="side-panel">
+        <div class="side-panel" style="width:220px">
           <div class="side-head"><h3>Correo</h3></div>
-          <div class="side-list">
+          <div class="side-list" style="display:flex;flex-direction:column;gap:3px">
             <button class="btn btn-solid" style="width:100%;justify-content:center;margin-bottom:8px" onclick="openCompose()">✏️ Nuevo Correo</button>
             <div class="s-label">Bandeja</div>
-            <button class="btn btn-ghost" style="width:100%;justify-content:flex-start;margin-bottom:3px" onclick="loadInbox()">📥 Recibidos</button>
+            <button class="btn btn-ghost" style="width:100%;justify-content:flex-start;margin-bottom:3px" id="eb-inbox" onclick="loadInbox()">📥 Recibidos</button>
             <button class="btn btn-ghost" style="width:100%;justify-content:flex-start;margin-bottom:3px" onclick="loadSent()">📤 Enviados</button>
+            <div class="s-label" style="margin-top:10px;display:flex;align-items:center;justify-content:space-between">
+              Remitentes <button onclick="openAddSenderFilter()" style="background:none;border:none;color:var(--teal);cursor:pointer;font-size:14px;line-height:1">＋</button>
+            </div>
+            <div id="sender-filters-list" style="display:flex;flex-direction:column;gap:2px">
+              <div style="font-size:10px;color:var(--text-dim);padding:4px 6px;font-style:italic">Sin filtros aún</div>
+            </div>
+            <div class="s-label" style="margin-top:10px">Palabras clave</div>
+            <div id="keyword-filters-list" style="display:flex;flex-direction:column;gap:2px">
+              <div style="font-size:10px;color:var(--text-dim);padding:4px 6px;font-style:italic">Sin filtros aún</div>
+            </div>
+            <button onclick="openAddKeywordFilter()" style="width:100%;background:transparent;border:1px dashed rgba(0,212,170,0.18);color:var(--text-dim);padding:6px;border-radius:4px;cursor:pointer;font-size:11px;margin-top:4px;transition:all .2s" onmouseover="this.style.borderColor='var(--teal)';this.style.color='var(--teal)'" onmouseout="this.style.borderColor='rgba(0,212,170,0.18)';this.style.color='var(--text-dim)'">＋ Añadir palabra clave</button>
           </div>
         </div>
         <div class="content-area">
           <div class="toolbar">
-            <input class="search-inp" id="email-search" placeholder="🔍 Buscar en Gmail..." style="width:240px">
+            <input class="search-inp" id="email-search" placeholder="🔍 Buscar en Gmail..." style="width:240px" onkeydown="if(event.key==='Enter')searchEmails()">
             <button class="btn btn-t" onclick="searchEmails()">Buscar</button>
+            <div class="ml-auto" style="font-size:11px;color:var(--text-dim)" id="email-filter-label"></div>
           </div>
           <div class="content-scroll" id="email-area">
             <div class="empty-state"><div class="e-ico">📭</div><p>Carga tu bandeja</p><button class="btn btn-t" style="margin-top:8px" onclick="loadInbox()">Cargar Recibidos</button></div>
@@ -1179,31 +1191,63 @@ select option{background:var(--bg3);}
 
 <!-- Email Viewer Modal -->
 <div class="overlay" id="m-email-view">
-  <div class="modal wide">
+  <div class="modal wide" style="max-width:680px">
     <div class="m-head">
-      <h2 id="ev-modal-subject" style="font-size:13px;max-width:70%;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">CORREO</h2>
+      <h2 id="ev-modal-subject" style="font-size:14px;max-width:65%;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">CORREO</h2>
       <div style="display:flex;gap:7px;align-items:center">
-        <button class="btn btn-t" style="font-size:10px;padding:5px 9px" id="ev-reply-btn">↩ Responder</button>
+        <button class="btn btn-t" style="font-size:11px;padding:6px 12px" id="ev-reply-btn">↩ Responder</button>
         <button class="m-close" onclick="closeM('m-email-view')">✕</button>
       </div>
     </div>
     <div class="m-body" style="padding:0">
-      <div style="padding:16px 22px;border-bottom:1px solid var(--border);display:flex;flex-direction:column;gap:5px;background:var(--bg4)">
-        <div style="display:flex;align-items:center;gap:10px">
-          <div id="ev-av" style="width:38px;height:38px;border-radius:50%;background:var(--teal-bg);display:flex;align-items:center;justify-content:center;font-family:'Orbitron',monospace;font-size:14px;font-weight:700;color:var(--teal);flex-shrink:0">?</div>
+      <div style="padding:16px 22px;border-bottom:1px solid var(--border);background:var(--bg4)">
+        <div style="display:flex;align-items:center;gap:12px;margin-bottom:8px">
+          <div id="ev-av" style="width:44px;height:44px;border-radius:50%;background:var(--teal-bg);display:flex;align-items:center;justify-content:center;font-family:'Orbitron',monospace;font-size:16px;font-weight:700;color:var(--teal);flex-shrink:0">?</div>
           <div style="flex:1">
-            <div id="ev-from-name" style="font-size:14px;font-weight:700"></div>
-            <div id="ev-from-email" style="font-size:11px;color:var(--text-dim);font-family:'Share Tech Mono',monospace"></div>
+            <div id="ev-from-name" style="font-size:16px;font-weight:700;margin-bottom:3px"></div>
+            <div id="ev-from-email" style="font-size:12px;color:var(--text-dim);font-family:'Share Tech Mono',monospace"></div>
           </div>
-          <div id="ev-date" style="font-size:10px;color:var(--text-dim);font-family:'Share Tech Mono',monospace;white-space:nowrap"></div>
+          <div id="ev-date" style="font-size:11px;color:var(--text-dim);font-family:'Share Tech Mono',monospace;white-space:nowrap;text-align:right"></div>
         </div>
-        <div style="display:flex;gap:6px;flex-wrap:wrap;padding-left:48px">
-          <span style="font-size:10px;color:var(--text-dim)">Para:</span>
-          <span id="ev-to" style="font-size:10px;color:var(--text-mid);font-family:'Share Tech Mono',monospace"></span>
+        <div style="padding-left:56px;display:flex;gap:6px;align-items:center">
+          <span style="font-size:11px;color:var(--text-dim)">Para:</span>
+          <span id="ev-to" style="font-size:11px;color:var(--text-mid);font-family:'Share Tech Mono',monospace"></span>
         </div>
       </div>
-      <div id="ev-body-content" style="padding:22px;min-height:200px;max-height:55vh;overflow-y:auto;line-height:1.7;font-size:14px;color:var(--text);white-space:pre-wrap;font-family:'Rajdhani',sans-serif"></div>
+      <div id="ev-body-content" style="padding:24px;min-height:220px;max-height:52vh;overflow-y:auto;line-height:1.8;font-size:15px;color:var(--text);white-space:pre-wrap;word-break:break-word"></div>
     </div>
+  </div>
+</div>
+
+<!-- Modal añadir filtro remitente -->
+<div class="overlay" id="m-add-sender">
+  <div class="modal" style="max-width:420px">
+    <div class="m-head"><h2>📨 FILTRAR REMITENTE</h2><button class="m-close" onclick="closeM('m-add-sender')">✕</button></div>
+    <div class="m-body">
+      <label class="m-label">Email o dominio del remitente</label>
+      <input class="m-inp" id="sf-input" placeholder="ej: juan@empresa.com o @empresa.com" onkeydown="if(event.key==='Enter')addSenderFilter()">
+      <label class="m-label">Etiqueta (opcional)</label>
+      <input class="m-inp" id="sf-label" placeholder="ej: Trabajo, Familia, Cliente...">
+      <div style="font-size:11px;color:var(--text-dim);background:var(--bg4);border:1px solid var(--border);border-radius:4px;padding:10px 12px;line-height:1.6">
+        💡 Al activar este filtro la bandeja mostrará <strong style="color:var(--teal)">solo</strong> correos de los remitentes que agregues aquí. Desactívalo desde el botón en el listado.
+      </div>
+    </div>
+    <div class="m-foot"><button class="btn-cancel" onclick="closeM('m-add-sender')">Cancelar</button><button class="btn-confirm" onclick="addSenderFilter()">AGREGAR</button></div>
+  </div>
+</div>
+
+<!-- Modal añadir filtro keyword -->
+<div class="overlay" id="m-add-keyword">
+  <div class="modal" style="max-width:420px">
+    <div class="m-head"><h2>🔑 FILTRAR PALABRA CLAVE</h2><button class="m-close" onclick="closeM('m-add-keyword')">✕</button></div>
+    <div class="m-body">
+      <label class="m-label">Palabra clave en asunto o contenido</label>
+      <input class="m-inp" id="kf-input" placeholder="ej: factura, reunión, urgente..." onkeydown="if(event.key==='Enter')addKeywordFilter()">
+      <div style="font-size:11px;color:var(--text-dim);background:var(--bg4);border:1px solid var(--border);border-radius:4px;padding:10px 12px">
+        💡 Solo verás correos que contengan esta palabra en el asunto o cuerpo.
+      </div>
+    </div>
+    <div class="m-foot"><button class="btn-cancel" onclick="closeM('m-add-keyword')">Cancelar</button><button class="btn-confirm" onclick="addKeywordFilter()">AGREGAR</button></div>
   </div>
 </div>
 
@@ -1218,7 +1262,9 @@ const S={
   view:'grid',pendingFiles:[],moveDocId:null,viewDocId:null,
   calYear:new Date().getFullYear(),calMonth:new Date().getMonth(),
   calEvents:[],attachedDocs:[],cpTarget:null,
-  googleEmail:'',googleName:''
+  googleEmail:'',googleName:'',
+  emailSenderFilters:[],  // [{email, label, active}]
+  emailKeywordFilters:[]  // [{keyword, active}]
 };
 
 // ══ API ════════════════════════════════════════════
@@ -1537,14 +1583,40 @@ async function sendEmail(){
 }
 
 async function loadInbox(){
-  const area=document.getElementById('email-area');area.innerHTML=thinking('Cargando bandeja...');setPill(['gmail-pill','set-gmail'],'syncing','Cargando...');
-  if(!googleAccessToken){area.innerHTML='<div class="empty-state"><div class="e-ico">🔑</div><p>Conecta tu cuenta Google primero</p></div>';setPill(['gmail-pill','set-gmail'],'err','Sin conexión');return;}
+  const area=document.getElementById('email-area');
+  area.innerHTML=thinking('Cargando bandeja...');
+  setPill(['gmail-pill','set-gmail'],'syncing','Cargando...');
+  if(!googleAccessToken){
+    area.innerHTML='<div class="empty-state"><div class="e-ico">🔑</div><p>Conecta tu cuenta Google primero</p></div>';
+    setPill(['gmail-pill','set-gmail'],'err','Sin conexión');return;
+  }
   try{
-    // Solo correos personales/primarios: excluye promociones, social, updates, foros y spam
-    const q=encodeURIComponent('in:inbox -category:promotions -category:social -category:updates -category:forums -in:spam -in:trash');
+    // Construir query con filtros activos
+    let queryParts=['in:inbox -category:promotions -category:social -category:updates -category:forums -in:spam -in:trash'];
+    const activeSenders=S.emailSenderFilters.filter(f=>f.active);
+    const activeKeywords=S.emailKeywordFilters.filter(f=>f.active);
+    if(activeSenders.length){
+      const fromQ=activeSenders.map(f=>`from:${f.email}`).join(' OR ');
+      queryParts.push(`(${fromQ})`);
+    }
+    if(activeKeywords.length){
+      const kwQ=activeKeywords.map(f=>`"${f.keyword}"`).join(' OR ');
+      queryParts.push(`(${kwQ})`);
+    }
+    const q=encodeURIComponent(queryParts.join(' '));
+    // Mostrar label de filtro activo
+    const filterLabel=document.getElementById('email-filter-label');
+    if(activeSenders.length||activeKeywords.length){
+      filterLabel.innerHTML=`<span style="color:var(--teal)">🔽 Filtros activos: ${activeSenders.length+activeKeywords.length}</span>`;
+    } else {
+      filterLabel.textContent='';
+    }
     const listRes=await fetch(`https://gmail.googleapis.com/gmail/v1/users/me/messages?maxResults=30&q=${q}`,{headers:{Authorization:'Bearer '+googleAccessToken}});
     const listData=await listRes.json();
-    if(!listData.messages||!listData.messages.length){area.innerHTML='<div class="empty-state"><div class="e-ico">📭</div><p>Bandeja vacía</p></div>';setPill(['gmail-pill','set-gmail'],'ok','Gmail ✓');return;}
+    if(!listData.messages||!listData.messages.length){
+      area.innerHTML='<div class="empty-state"><div class="e-ico">📭</div><p>No hay correos con los filtros actuales</p></div>';
+      setPill(['gmail-pill','set-gmail'],'ok','Gmail ✓');return;
+    }
     const emails=await Promise.all(listData.messages.map(async m=>{
       const r=await fetch(`https://gmail.googleapis.com/gmail/v1/users/me/messages/${m.id}?format=metadata&metadataHeaders=From&metadataHeaders=To&metadataHeaders=Subject&metadataHeaders=Date`,{headers:{Authorization:'Bearer '+googleAccessToken}});
       const d=await r.json();
@@ -1555,30 +1627,112 @@ async function loadInbox(){
       const fromEmail=(from.match(/<([^>]+)>/)||[,''])[1]||from;
       const isUnread=(d.labelIds||[]).includes('UNREAD');
       const hasAtt=(d.payload?.parts||[]).some(p=>p.filename&&p.filename.length>0);
-      return{id:m.id,from_name:fromName,from_email:fromEmail,to:get('To'),subject:get('Subject')||'(sin asunto)',date:new Date(parseInt(d.internalDate)).toLocaleDateString('es-ES',{day:'numeric',month:'short',hour:'2-digit',minute:'2-digit'}),preview:(d.snippet||'').substring(0,120),has_attachment:hasAtt,unread:isUnread};
+      return{id:m.id,from_name:fromName,from_email:fromEmail,to:get('To'),subject:get('Subject')||'(sin asunto)',ts:parseInt(d.internalDate)||0,date:new Date(parseInt(d.internalDate)).toLocaleDateString('es-ES',{day:'numeric',month:'short',hour:'2-digit',minute:'2-digit'}),preview:(d.snippet||'').substring(0,140),has_attachment:hasAtt,unread:isUnread};
     }));
     setPill(['gmail-pill','set-gmail'],'ok',`Gmail — ${emails.length} correos`);
     document.getElementById('gmail-crumb').textContent=`Bandeja — ${emails.length} correos`;
     area.innerHTML=`<div class="email-list">${emails.map(em=>{
       const av=(em.from_name||em.from_email||'?')[0].toUpperCase();
-      return `<div class="email-it" style="${em.unread?'border-left:2px solid var(--teal);':''}" onclick="openEmailView('${escA(em.id)}','${escA(em.from_name)}','${escA(em.from_email)}','${escA(em.to)}','${escA(em.subject)}','${escA(em.date)}')">
-        <div class="em-av" style="background:${em.unread?'var(--teal-bg)':'var(--bg5)'}">${av}</div>
+      const dataAttrs=`data-id="${escA(em.id)}" data-from-name="${escA(em.from_name)}" data-from-email="${escA(em.from_email)}" data-to="${escA(em.to)}" data-subject="${escA(em.subject)}" data-date="${escA(em.date)}"`;
+      return `<div class="email-it" ${dataAttrs} style="${em.unread?'border-left:3px solid var(--teal);':''};cursor:pointer" ondblclick="openEmailViewFromEl(this)">
+        <div class="em-av" style="width:40px;height:40px;font-size:16px;background:${em.unread?'var(--teal-bg)':'var(--bg5)'}">${av}</div>
         <div class="em-body">
-          <div class="em-from" style="${em.unread?'font-weight:800;color:var(--text)':''}">${escH(em.from_name||em.from_email)}</div>
-          <div class="em-subject" style="${em.unread?'font-weight:700;color:var(--text)':''}">${escH(em.subject)}</div>
-          <div class="em-preview">${escH(em.preview)}</div>
+          <div class="em-from" style="font-size:15px;${em.unread?'font-weight:800;color:var(--text)':'font-weight:600'}">${escH(em.from_name||em.from_email)}</div>
+          <div class="em-subject" style="font-size:14px;margin-top:3px;${em.unread?'font-weight:700;color:var(--text)':'color:var(--text-mid)'}">${escH(em.subject)}</div>
+          <div class="em-preview" style="font-size:13px;margin-top:3px;color:var(--text-dim)">${escH(em.preview)}</div>
         </div>
         <div class="em-meta">
-          <div class="em-time">${em.date}</div>
-          ${em.has_attachment?'<span style="font-size:10px;color:var(--gold)">📎</span>':''}
-          ${em.unread?'<span style="font-size:8px;background:var(--teal);color:#000;border-radius:8px;padding:1px 5px;font-weight:800">NEW</span>':''}
+          <div class="em-time" style="font-size:11px">${em.date}</div>
+          ${em.has_attachment?'<span style="font-size:11px;color:var(--gold)">📎</span>':''}
+          ${em.unread?'<span style="font-size:9px;background:var(--teal);color:#000;border-radius:8px;padding:2px 6px;font-weight:800">NEW</span>':''}
+          <button class="btn btn-ghost" style="font-size:10px;padding:3px 8px;margin-top:3px" onclick="event.stopPropagation();replyTo('${escA(em.from_email||'')}','${escA(em.subject||'')}')">↩</button>
         </div>
       </div>`;
     }).join('')}</div>`;
-  }catch(e){area.innerHTML=`<div class="empty-state"><div class="e-ico">⚠️</div><p>${e.message}</p></div>`;setPill(['gmail-pill','set-gmail'],'err','Error Gmail');}
+  }catch(e){
+    area.innerHTML=`<div class="empty-state"><div class="e-ico">⚠️</div><p>${e.message}</p></div>`;
+    setPill(['gmail-pill','set-gmail'],'err','Error Gmail');
+  }
 }
 
-async function openEmailView(id, fromName, fromEmail, to, subject, date){
+function openEmailViewFromEl(el){
+  openEmailView(
+    el.dataset.id,
+    el.dataset.fromName,
+    el.dataset.fromEmail,
+    el.dataset.to,
+    el.dataset.subject,
+    el.dataset.date
+  );
+}
+
+// ── Funciones de filtros ─────────────────────────────
+function openAddSenderFilter(){ document.getElementById('sf-input').value=''; document.getElementById('sf-label').value=''; openM('m-add-sender'); }
+function openAddKeywordFilter(){ document.getElementById('kf-input').value=''; openM('m-add-keyword'); }
+
+function addSenderFilter(){
+  const val=document.getElementById('sf-input').value.trim();
+  if(!val)return toast('Escribe un email o dominio','warn');
+  const lbl=document.getElementById('sf-label').value.trim()||val;
+  S.emailSenderFilters.push({email:val,label:lbl,active:true});
+  closeM('m-add-sender');
+  renderEmailFilters();
+  loadInbox();
+  toast('Filtro de remitente añadido ✓');
+}
+
+function addKeywordFilter(){
+  const val=document.getElementById('kf-input').value.trim();
+  if(!val)return toast('Escribe una palabra clave','warn');
+  S.emailKeywordFilters.push({keyword:val,active:true});
+  closeM('m-add-keyword');
+  renderEmailFilters();
+  loadInbox();
+  toast('Filtro de palabra clave añadido ✓');
+}
+
+function toggleSenderFilter(i){
+  S.emailSenderFilters[i].active=!S.emailSenderFilters[i].active;
+  renderEmailFilters(); loadInbox();
+}
+function removeSenderFilter(i){
+  S.emailSenderFilters.splice(i,1);
+  renderEmailFilters(); loadInbox();
+}
+function toggleKeywordFilter(i){
+  S.emailKeywordFilters[i].active=!S.emailKeywordFilters[i].active;
+  renderEmailFilters(); loadInbox();
+}
+function removeKeywordFilter(i){
+  S.emailKeywordFilters.splice(i,1);
+  renderEmailFilters(); loadInbox();
+}
+
+function renderEmailFilters(){
+  const sl=document.getElementById('sender-filters-list');
+  const kl=document.getElementById('keyword-filters-list');
+  if(!sl||!kl)return;
+  if(!S.emailSenderFilters.length){
+    sl.innerHTML='<div style="font-size:10px;color:var(--text-dim);padding:4px 6px;font-style:italic">Sin filtros aún</div>';
+  } else {
+    sl.innerHTML=S.emailSenderFilters.map((f,i)=>`
+      <div style="display:flex;align-items:center;gap:5px;padding:5px 7px;background:${f.active?'var(--teal-bg)':'var(--bg4)'};border:1px solid ${f.active?'rgba(0,212,170,0.3)':'var(--border)'};border-radius:4px;margin-bottom:2px">
+        <span style="flex:1;font-size:11px;color:${f.active?'var(--teal)':'var(--text-dim)'};overflow:hidden;text-overflow:ellipsis;white-space:nowrap" title="${escH(f.email)}">${escH(f.label)}</span>
+        <button onclick="toggleSenderFilter(${i})" style="background:none;border:none;cursor:pointer;font-size:12px;padding:0 2px" title="${f.active?'Desactivar':'Activar'}">${f.active?'✅':'⬜'}</button>
+        <button onclick="removeSenderFilter(${i})" style="background:none;border:none;cursor:pointer;font-size:12px;color:var(--red);padding:0 2px">✕</button>
+      </div>`).join('');
+  }
+  if(!S.emailKeywordFilters.length){
+    kl.innerHTML='<div style="font-size:10px;color:var(--text-dim);padding:4px 6px;font-style:italic">Sin filtros aún</div>';
+  } else {
+    kl.innerHTML=S.emailKeywordFilters.map((f,i)=>`
+      <div style="display:flex;align-items:center;gap:5px;padding:5px 7px;background:${f.active?'var(--gold-bg)':'var(--bg4)'};border:1px solid ${f.active?'rgba(245,166,35,0.3)':'var(--border)'};border-radius:4px;margin-bottom:2px">
+        <span style="flex:1;font-size:11px;color:${f.active?'var(--gold)':'var(--text-dim)'}">${escH(f.keyword)}</span>
+        <button onclick="toggleKeywordFilter(${i})" style="background:none;border:none;cursor:pointer;font-size:12px;padding:0 2px">${f.active?'✅':'⬜'}</button>
+        <button onclick="removeKeywordFilter(${i})" style="background:none;border:none;cursor:pointer;font-size:12px;color:var(--red);padding:0 2px">✕</button>
+      </div>`).join('');
+  }
+}
   // Rellenar cabecera del modal
   document.getElementById('ev-modal-subject').textContent=subject;
   document.getElementById('ev-av').textContent=(fromName||fromEmail||'?')[0].toUpperCase();
@@ -1689,45 +1843,82 @@ async function searchContacts(){
   }catch(e){area.innerHTML=`<div class="empty-state"><div class="e-ico">⚠️</div><p>${e.message}</p></div>`;setPill('cont-pill','err','Error');}
 }
 async function loadAllContacts(){
-  const area=document.getElementById('cont-area');area.innerHTML=thinking('Cargando contactos...');setPill('cont-pill','syncing');
-  if(!googleAccessToken){area.innerHTML='<div class="empty-state"><div class="e-ico">🔑</div><p>Conecta tu cuenta Google primero</p></div>';setPill('cont-pill','err','Sin conexión');return;}
+  const area=document.getElementById('cont-area');
+  area.innerHTML=thinking('Cargando contactos...');
+  setPill('cont-pill','syncing');
+  if(!googleAccessToken){
+    area.innerHTML='<div class="empty-state"><div class="e-ico">🔑</div><p>Conecta tu cuenta Google primero</p></div>';
+    setPill('cont-pill','err','Sin conexión');return;
+  }
   try{
     const fields='names,emailAddresses,phoneNumbers,organizations,photos';
-    // Intentar contactos guardados del usuario
-    const res=await fetch(`https://people.googleapis.com/v1/people/me/connections?pageSize=200&personFields=${fields}`,{headers:{Authorization:'Bearer '+googleAccessToken}});
-    const d=await res.json();
-    if(d.error)throw new Error(d.error.message);
+    let contacts=[];
 
-    let contacts=(d.connections||[])
-      .map(p=>({
+    // 1. Contactos guardados del usuario
+    const r1=await fetch(`https://people.googleapis.com/v1/people/me/connections?pageSize=200&personFields=${fields}`,
+      {headers:{Authorization:'Bearer '+googleAccessToken}});
+    const d1=await r1.json();
+    if(d1.error && d1.error.code!==403) throw new Error(d1.error.message);
+    if(d1.connections?.length){
+      contacts=d1.connections.map(p=>({
         name:p.names?.[0]?.displayName||'',
         email:p.emailAddresses?.[0]?.value||'',
         phone:p.phoneNumbers?.[0]?.value||'',
         company:p.organizations?.[0]?.name||'',
         photo:p.photos?.[0]?.url||''
-      }))
-      .filter(c=>c.email);
+      })).filter(c=>c.email);
+    }
 
-    // Si no hay contactos guardados, buscar en "otros contactos" (personas con las que interactuaste)
-    if(!contacts.length){
-      const res2=await fetch(`https://people.googleapis.com/v1/otherContacts?pageSize=200&readMask=${fields}`,{headers:{Authorization:'Bearer '+googleAccessToken}});
-      const d2=await res2.json();
-      contacts=(d2.otherContacts||[])
-        .map(p=>({
+    // 2. "Otros contactos" (personas con quienes has interactuado por email)
+    if(contacts.length<5){
+      const r2=await fetch(`https://people.googleapis.com/v1/otherContacts?pageSize=200&readMask=${fields}`,
+        {headers:{Authorization:'Bearer '+googleAccessToken}});
+      const d2=await r2.json();
+      if(!d2.error && d2.otherContacts?.length){
+        const extras=d2.otherContacts.map(p=>({
           name:p.names?.[0]?.displayName||'',
           email:p.emailAddresses?.[0]?.value||'',
           phone:p.phoneNumbers?.[0]?.value||'',
           company:p.organizations?.[0]?.name||'',
           photo:p.photos?.[0]?.url||''
-        }))
-        .filter(c=>c.email);
+        })).filter(c=>c.email);
+        // Combinar sin duplicados
+        const existingEmails=new Set(contacts.map(c=>c.email.toLowerCase()));
+        contacts=[...contacts,...extras.filter(c=>!existingEmails.has(c.email.toLowerCase()))];
+      }
+    }
+
+    // 3. Si aún vacío, extraer de historial Gmail reciente
+    if(!contacts.length){
+      area.innerHTML=thinking('Buscando en historial de Gmail...');
+      const gRes=await fetch(`https://gmail.googleapis.com/gmail/v1/users/me/messages?maxResults=50&labelIds=SENT`,
+        {headers:{Authorization:'Bearer '+googleAccessToken}});
+      const gData=await gRes.json();
+      if(gData.messages?.length){
+        const emailSet=new Map();
+        await Promise.all(gData.messages.slice(0,20).map(async m=>{
+          const r=await fetch(`https://gmail.googleapis.com/gmail/v1/users/me/messages/${m.id}?format=metadata&metadataHeaders=To`,
+            {headers:{Authorization:'Bearer '+googleAccessToken}});
+          const d=await r.json();
+          const to=(d.payload?.headers||[]).find(h=>h.name==='To')?.value||'';
+          const email=(to.match(/<([^>]+)>/)||[,''])[1]||to;
+          const name=to.replace(/<[^>]+>/,'').replace(/"/g,'').trim()||email;
+          if(email&&email.includes('@')&&!emailSet.has(email.toLowerCase())){
+            emailSet.set(email.toLowerCase(),{name,email,phone:'',company:'',photo:''});
+          }
+        }));
+        contacts=[...emailSet.values()];
+      }
     }
 
     contacts.sort((a,b)=>(a.name||a.email).localeCompare(b.name||b.email,'es'));
     setPill('cont-pill','ok',`${contacts.length} contactos`);
     document.getElementById('cont-status').textContent=contacts.length+' contacto(s)';
     renderContactCards(contacts,area);
-  }catch(e){area.innerHTML=`<div class="empty-state"><div class="e-ico">⚠️</div><p>${e.message}</p></div>`;setPill('cont-pill','err','Error: '+e.message);}
+  }catch(e){
+    area.innerHTML=`<div class="empty-state"><div class="e-ico">⚠️</div><p>Error: ${e.message}</p><p style="font-size:11px;color:var(--text-dim);margin-top:8px">Asegúrate de haber dado permisos de Contactos al conectar Google</p></div>`;
+    setPill('cont-pill','err','Error');
+  }
 }
 function renderContactCards(cs,area){
   if(!cs.length){area.innerHTML='<div class="empty-state"><div class="e-ico">👤</div><p>Sin contactos</p></div>';return;}
