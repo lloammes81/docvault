@@ -715,6 +715,7 @@ select option{background:var(--bg3);}
         <div class="topbar-sep"></div>
         <div class="topbar-crumb" id="gmail-crumb">Gmail conectado</div>
         <div id="gmail-pill" class="sync-pill idle"><div class="sp-dot"></div>Sin sincronizar</div>
+        <button class="btn btn-t" style="font-size:11px;padding:5px 10px" onclick="loadInbox()">↺ Sync</button>
       </div>
       <div style="display:flex;flex:1;overflow:hidden">
         <div class="side-panel">
@@ -768,6 +769,7 @@ select option{background:var(--bg3);}
         <div class="topbar-sep"></div>
         <div class="topbar-crumb">Google Calendar conectado</div>
         <div id="cal-pill" class="sync-pill idle"><div class="sp-dot"></div>Sin sincronizar</div>
+        <button class="btn btn-t" style="font-size:11px;padding:5px 10px" onclick="loadCalEvents()">↺ Sync</button>
       </div>
       <div style="display:flex;flex:1;overflow:hidden">
         <div class="side-panel">
@@ -802,6 +804,7 @@ select option{background:var(--bg3);}
         <div class="topbar-sep"></div>
         <div class="topbar-crumb">Google Contacts conectado</div>
         <div id="cont-pill" class="sync-pill idle"><div class="sp-dot"></div>Sin sincronizar</div>
+        <button class="btn btn-t" style="font-size:11px;padding:5px 10px" onclick="loadAllContacts()">↺ Sync</button>
       </div>
       <div class="content-area">
         <div class="toolbar">
@@ -1363,6 +1366,14 @@ function enterApp(){
   renderFolders(); updateStats(); renderUsers(); initCal();
   toast('✅ Conectado como '+S.googleEmail);
   setTimeout(()=>{ if(typeof showInboxPopup==='function') showInboxPopup(); }, 700);
+  // Carga automática de datos Google
+  setTimeout(async ()=>{
+    if(googleAccessToken){
+      loadInbox();
+      loadAllContacts();
+      loadCalEvents();
+    }
+  }, 900);
 }
 
 // System login (no Google)
@@ -2081,6 +2092,93 @@ async function searchEmails(){
 }
 
 
+// ══ CONTACTOS ══════════════════════════════════════
+async function loadAllContacts(){
+  const area=document.getElementById('cont-area');
+  const status=document.getElementById('cont-status');
+  area.innerHTML=thinking('Cargando contactos...');
+  setPill(['cont-pill','set-cont'],'syncing','Cargando...');
+  if(!googleAccessToken){
+    area.innerHTML='<div class="empty-state"><div class="e-ico">🔑</div><p>Conecta tu cuenta Google primero</p></div>';
+    setPill(['cont-pill','set-cont'],'err','Sin conexión');return;
+  }
+  try{
+    const res=await fetch('https://people.googleapis.com/v1/people/me/connections?personFields=names,emailAddresses,phoneNumbers,photos&pageSize=200&sortOrder=FIRST_NAME_ASCENDING',
+      {headers:{Authorization:'Bearer '+googleAccessToken}});
+    const d=await res.json();
+    if(d.error) throw new Error(d.error.message);
+    const contacts=(d.connections||[]).map(p=>({
+      name:(p.names||[])[0]?.displayName||'Sin nombre',
+      email:(p.emailAddresses||[])[0]?.value||'',
+      phone:(p.phoneNumbers||[])[0]?.value||'',
+      photo:(p.photos||[])[0]?.url||''
+    })).filter(c=>c.name!=='Sin nombre'||c.email);
+    setPill(['cont-pill','set-cont'],'ok',`Contacts — ${contacts.length}`);
+    if(status) status.textContent=contacts.length+' contactos';
+    if(!contacts.length){area.innerHTML='<div class="empty-state"><div class="e-ico">👥</div><p>Sin contactos</p></div>';return;}
+    area.innerHTML=contacts.map(c=>{
+      const initials=(c.name||'?').split(' ').map(w=>w[0]).join('').toUpperCase().slice(0,2);
+      const colors=['#1a73e8','#0f9d58','#a142f4','#d93025','#e8710a','#1e88e5'];
+      const color=colors[(c.name||'').charCodeAt(0)%colors.length];
+      return `<div class="contact-card">
+        <div class="c-av" style="background:${c.photo?'transparent':color};color:#fff;overflow:hidden">
+          ${c.photo?`<img src="${c.photo}" style="width:100%;height:100%;object-fit:cover;border-radius:50%">`:`${initials}`}
+        </div>
+        <div class="c-info">
+          <div class="c-name">${escH(c.name)}</div>
+          ${c.email?`<div class="c-email">${escH(c.email)}</div>`:''}
+          ${c.phone?`<div class="c-phone">${escH(c.phone)}</div>`:''}
+        </div>
+        <div class="c-actions">
+          ${c.email?`<button class="btn btn-t" style="font-size:10px;padding:4px 9px" onclick="document.getElementById('em-to').value='${escA(c.email)}';switchMod('email');openCompose()">✉</button>`:''}
+        </div>
+      </div>`;
+    }).join('');
+  }catch(e){
+    area.innerHTML=`<div class="empty-state"><div class="e-ico">⚠️</div><p>${e.message}</p></div>`;
+    setPill(['cont-pill','set-cont'],'err','Error');
+  }
+}
+
+async function searchContacts(){
+  const q=(document.getElementById('cont-search').value||'').trim();
+  if(!q) return loadAllContacts();
+  const area=document.getElementById('cont-area');
+  area.innerHTML=thinking(`Buscando "${q}"...`);
+  if(!googleAccessToken){area.innerHTML='<div class="empty-state"><div class="e-ico">🔑</div><p>Conecta Google primero</p></div>';return;}
+  try{
+    const res=await fetch(`https://people.googleapis.com/v1/people:searchContacts?query=${encodeURIComponent(q)}&readMask=names,emailAddresses,phoneNumbers,photos&pageSize=30`,
+      {headers:{Authorization:'Bearer '+googleAccessToken}});
+    const d=await res.json();
+    if(d.error) throw new Error(d.error.message);
+    const contacts=(d.results||[]).map(r=>r.person).map(p=>({
+      name:(p.names||[])[0]?.displayName||'Sin nombre',
+      email:(p.emailAddresses||[])[0]?.value||'',
+      phone:(p.phoneNumbers||[])[0]?.value||'',
+      photo:(p.photos||[])[0]?.url||''
+    }));
+    if(!contacts.length){area.innerHTML='<div class="empty-state"><div class="e-ico">🔍</div><p>Sin resultados para "'+escH(q)+'"</p></div>';return;}
+    area.innerHTML=contacts.map(c=>{
+      const initials=(c.name||'?').split(' ').map(w=>w[0]).join('').toUpperCase().slice(0,2);
+      const colors=['#1a73e8','#0f9d58','#a142f4','#d93025','#e8710a','#1e88e5'];
+      const color=colors[(c.name||'').charCodeAt(0)%colors.length];
+      return `<div class="contact-card">
+        <div class="c-av" style="background:${c.photo?'transparent':color};color:#fff;overflow:hidden">
+          ${c.photo?`<img src="${c.photo}" style="width:100%;height:100%;object-fit:cover;border-radius:50%">`:`${initials}`}
+        </div>
+        <div class="c-info">
+          <div class="c-name">${escH(c.name)}</div>
+          ${c.email?`<div class="c-email">${escH(c.email)}</div>`:''}
+          ${c.phone?`<div class="c-phone">${escH(c.phone)}</div>`:''}
+        </div>
+        <div class="c-actions">
+          ${c.email?`<button class="btn btn-t" style="font-size:10px;padding:4px 9px" onclick="document.getElementById('em-to').value='${escA(c.email)}';switchMod('email');openCompose()">✉</button>`:''}
+        </div>
+      </div>`;
+    }).join('');
+  }catch(e){area.innerHTML=`<div class="empty-state"><div class="e-ico">⚠️</div><p>${e.message}</p></div>`;}
+}
+
 async function loadCalEvents(){
   const upEl=document.getElementById('upcoming-events');const msg=document.getElementById('cal-msg');
   upEl.innerHTML='<div style="color:var(--text-dim);font-size:11px">Cargando...</div>';msg.innerHTML=thinking('Sincronizando Google Calendar...');setPill(['cal-pill','set-cal'],'syncing','Cargando...');
@@ -2553,6 +2651,14 @@ async function onGoogleToken(r){
   setSyncAll('ok');
   if(!window._silentRefresh) toast('✅ Google conectado: '+S.googleEmail);
   window._silentRefresh=false;
+  // Carga automática de datos al conectar Google desde Settings
+  setTimeout(async ()=>{
+    if(googleAccessToken){
+      loadInbox();
+      loadAllContacts();
+      loadCalEvents();
+    }
+  }, 600);
 }
 
 // Refrescar token antes de que expire (cada 50 min)
