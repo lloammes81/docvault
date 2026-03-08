@@ -354,15 +354,15 @@ body{font-family:'Rajdhani',sans-serif;background:var(--bg);color:var(--text);he
 .ev-info .ev-att{font-size:11px;color:var(--text-mid);margin-top:2px;}
 
 /* CONTACTS */
-.contact-card{display:flex;align-items:center;gap:12px;padding:11px 13px;background:var(--bg3);border:1px solid var(--border);border-radius:4px;margin-bottom:4px;transition:all .15s;}
+.contact-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(280px,1fr));gap:6px;padding:4px;}
+.contact-card{display:flex;align-items:center;gap:12px;padding:11px 13px;background:var(--bg3);border:1px solid var(--border);border-radius:4px;transition:all .15s;}
 .contact-card:hover{border-color:rgba(0,212,170,0.28);background:var(--bg4);}
-.c-av{width:38px;height:38px;border-radius:50%;background:var(--bg5);display:flex;align-items:center;justify-content:center;font-family:'Orbitron',monospace;font-size:13px;font-weight:700;flex-shrink:0;color:var(--teal);}
-.c-info{flex:1;}
-.c-name{font-size:14px;font-weight:700;}
-.c-email{font-size:11px;color:var(--text-dim);margin-top:2px;}
-.c-phone{font-size:11px;color:var(--text-mid);}
-.c-actions{display:flex;gap:5px;}
-
+.c-av{width:38px;height:38px;border-radius:50%;background:var(--bg5);display:flex;align-items:center;justify-content:center;font-size:13px;font-weight:700;flex-shrink:0;color:#fff;}
+.c-info{flex:1;min-width:0;}
+.c-name{font-size:13px;font-weight:700;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;}
+.c-email{font-size:11px;color:var(--text-dim);margin-top:2px;overflow:hidden;text-overflow:ellipsis;}
+.c-phone{font-size:11px;color:var(--text-mid);margin-top:1px;}
+.c-actions{display:flex;gap:5px;flex-shrink:0;margin-left:auto;}
 /* USERS */
 .user-card{display:flex;align-items:center;gap:12px;padding:12px 15px;background:var(--bg3);border:1px solid var(--border);border-radius:4px;margin-bottom:5px;transition:all .15s;}
 .user-card:hover{border-color:rgba(0,212,170,0.18);}
@@ -1502,7 +1502,17 @@ function updateProfileUI(){
 
 function updateGoogleSettingsUI(){
   if(!S.googleEmail) return;
-  document.getElementById('gc-av').textContent=S.googleEmail[0].toUpperCase();
+  const gcAv = document.getElementById('gc-av');
+  if(gcAv){
+    if(S.currentUser?.avatar){
+      gcAv.innerHTML = `<img src="${S.currentUser.avatar}" style="width:100%;height:100%;object-fit:cover;border-radius:50%">`;
+      gcAv.style.background = 'transparent';
+      gcAv.style.overflow = 'hidden';
+    } else {
+      gcAv.textContent = S.googleEmail[0].toUpperCase();
+      gcAv.style.background = 'linear-gradient(135deg,#4285f4,#34a853)';
+    }
+  }
   document.getElementById('gc-name').textContent=S.googleName||S.googleEmail.split('@')[0];
   document.getElementById('gc-email').textContent=S.googleEmail;
   const f=document.getElementById('set-google-form');
@@ -1763,6 +1773,10 @@ async function loadInbox(){
             ${em.has_att?'<span class="em-badge-att">📎</span>':''}
             ${em.unread?'<span class="em-badge-new">NEW</span>':''}
           </div>
+          <div class="em-actions" style="display:flex;gap:3px;opacity:0;transition:opacity .15s" onmouseenter="this.style.opacity=1" onmouseleave="this.style.opacity=0">
+            <button title="Eliminar" style="background:rgba(255,64,96,.12);border:1px solid rgba(255,64,96,.25);color:#ff4060;border-radius:3px;padding:3px 7px;cursor:pointer;font-size:11px" onclick="event.stopPropagation();deleteEmail('${escA(em.id)}',this.closest('.email-it'))">🗑</button>
+            <button title="Bloquear remitente" style="background:rgba(245,166,35,.10);border:1px solid rgba(245,166,35,.25);color:var(--gold);border-radius:3px;padding:3px 7px;cursor:pointer;font-size:11px" onclick="event.stopPropagation();blockSender('${escA(em.from_email)}','${escA(em.from_name||em.from_email)}')">🚫</button>
+          </div>
         </div>
       </div>`;
     }).join('')}</div>`;
@@ -1778,6 +1792,101 @@ function setEmailNav(btn){
 }
 
 function markAllRead(){ toast('Función disponible próximamente','warn'); }
+
+// ── Eliminar email ─────────────────────────────────
+async function deleteEmail(msgId, rowEl){
+  if(!googleAccessToken){ toast('Conecta Google primero','err'); return; }
+  try{
+    rowEl.style.opacity='0.4';rowEl.style.pointerEvents='none';
+    const r = await fetch(`https://gmail.googleapis.com/gmail/v1/users/me/messages/${msgId}/trash`,{
+      method:'POST', headers:{Authorization:'Bearer '+googleAccessToken}
+    });
+    if(!r.ok) throw new Error('Error '+r.status);
+    rowEl.style.transition='all .3s';
+    rowEl.style.height='0';rowEl.style.padding='0';rowEl.style.overflow='hidden';
+    setTimeout(()=>rowEl.remove(), 300);
+    toast('Email eliminado ✓');
+  }catch(e){ rowEl.style.opacity='1';rowEl.style.pointerEvents=''; toast('Error al eliminar: '+e.message,'err'); }
+}
+
+// ── Bloquear remitente ─────────────────────────────
+function blockSender(email, label){
+  if(!email){ toast('No se pudo obtener el email','err'); return; }
+  const exists = S.emailSenderFilters.find(f=>f.email===email);
+  if(exists){ toast('Este remitente ya está en tus filtros','warn'); return; }
+  S.emailSenderFilters.push({email, label: label||email, active:false});
+  renderEmailFilters();
+  toast(`🚫 ${email} bloqueado — sus emails no aparecerán`);
+  // Recargar inbox sin ese remitente
+  setTimeout(loadInbox, 400);
+}
+
+// ── Contact Picker (para el campo "Para" del email y eventos) ─────
+function openCPicker(targetInputId){
+  window._cpTarget = targetInputId;
+  const area = document.getElementById('cp-list');
+  if(!area){ toast('Cargando contactos...','warn'); loadCPickerContacts(targetInputId); return; }
+  loadCPickerContacts(targetInputId);
+  openM('m-cpicker');
+}
+
+async function loadCPickerContacts(targetId){
+  // Crear modal de contactos si no existe
+  if(!document.getElementById('m-cpicker')){
+    const div = document.createElement('div');
+    div.className='overlay'; div.id='m-cpicker';
+    div.innerHTML=`<div class="modal" style="width:420px;max-height:80vh;display:flex;flex-direction:column">
+      <div class="m-head"><h2>👤 SELECCIONAR CONTACTO</h2><button class="m-close" onclick="closeM('m-cpicker')">✕</button></div>
+      <div style="padding:12px 20px 0"><input class="m-inp" id="cp-search" placeholder="🔍 Buscar..." oninput="filterCPicker(this.value)" style="margin:0"></div>
+      <div class="m-body" style="flex:1;overflow-y:auto;padding-top:8px" id="cp-list"></div>
+    </div>`;
+    document.body.appendChild(div);
+  }
+  window._cpTarget = targetId;
+  const area = document.getElementById('cp-list');
+  area.innerHTML='<div style="padding:16px;color:var(--text-dim);text-align:center">Cargando contactos...</div>';
+  openM('m-cpicker');
+  if(!googleAccessToken){ area.innerHTML='<div style="padding:16px;color:var(--red);text-align:center">⚠ Conecta Google primero</div>'; return; }
+  try{
+    const res = await fetch('https://people.googleapis.com/v1/people/me/connections?personFields=names,emailAddresses&pageSize=200&sortOrder=FIRST_NAME_ASCENDING',
+      {headers:{Authorization:'Bearer '+googleAccessToken}});
+    const d = await res.json();
+    if(d.error) throw new Error(d.error.message);
+    window._cpContacts = (d.connections||[])
+      .map(p=>({name:(p.names||[])[0]?.displayName||'',email:(p.emailAddresses||[])[0]?.value||''}))
+      .filter(c=>c.email);
+    renderCPicker(window._cpContacts);
+  }catch(e){ area.innerHTML=`<div style="padding:16px;color:var(--red);text-align:center">⚠ ${e.message}</div>`; }
+}
+
+function renderCPicker(contacts){
+  const area = document.getElementById('cp-list');
+  if(!area) return;
+  if(!contacts.length){ area.innerHTML='<div style="padding:16px;color:var(--text-dim);text-align:center">Sin contactos</div>'; return; }
+  area.innerHTML = contacts.map(c=>`
+    <div style="display:flex;align-items:center;gap:10px;padding:9px 20px;cursor:pointer;border-bottom:1px solid rgba(255,255,255,0.05);transition:background .1s" onmouseenter="this.style.background='rgba(0,212,170,0.06)'" onmouseleave="this.style.background=''" onclick="selectContact('${escA(c.email)}','${escA(c.name)}')">
+      <div style="width:32px;height:32px;border-radius:50%;background:linear-gradient(135deg,var(--teal),#00a88a);display:flex;align-items:center;justify-content:center;font-size:13px;font-weight:700;color:#000;flex-shrink:0">${(c.name||c.email)[0].toUpperCase()}</div>
+      <div style="min-width:0;flex:1">
+        <div style="font-size:13px;font-weight:600;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">${escH(c.name||c.email)}</div>
+        <div style="font-size:11px;color:var(--text-dim);overflow:hidden;text-overflow:ellipsis">${escH(c.email)}</div>
+      </div>
+    </div>`).join('');
+}
+
+function filterCPicker(q){
+  if(!window._cpContacts) return;
+  const f = q.toLowerCase();
+  renderCPicker(window._cpContacts.filter(c=>(c.name+c.email).toLowerCase().includes(f)));
+}
+
+function selectContact(email, name){
+  const inp = document.getElementById(window._cpTarget);
+  if(inp){
+    const cur = inp.value.trim();
+    inp.value = cur ? cur+', '+email : email;
+  }
+  closeM('m-cpicker');
+}
 
 function openEmailViewFromEl(el){
   openEmailView(el.dataset.id,el.dataset.fromName,el.dataset.fromEmail,el.dataset.to,el.dataset.subject,el.dataset.date);
@@ -1938,6 +2047,108 @@ async function openEmailView(id, fromName, fromEmail, to, subject, date){
   }catch(e){
     bodyEl.innerHTML=`<div class="ev-body-text" style="color:#d93025">Error al cargar: ${escH(e.message)}</div>`;
   }
+}
+
+// ── Eliminar email ────────────────────────────────
+async function deleteEmail(msgId){
+  if(!googleAccessToken){toast('Reconecta Google primero','err');return;}
+  if(!confirm('¿Mover este correo a la papelera?')) return;
+  try{
+    await fetch(`https://gmail.googleapis.com/gmail/v1/users/me/messages/${msgId}/trash`,{
+      method:'POST', headers:{Authorization:'Bearer '+googleAccessToken}
+    });
+    toast('Correo eliminado ✓');
+    closeM('m-email-view');
+    loadInbox();
+  }catch(e){ toast('Error al eliminar: '+e.message,'err'); }
+}
+
+// ── Bloquear remitente ────────────────────────────
+function blockSender(email, name){
+  if(!email){toast('Sin email para bloquear','warn');return;}
+  if(!confirm(`¿Bloquear todos los correos de ${name||email}?\nSe filtrarán automáticamente.`)) return;
+  const domain = email.includes('@') ? email.split('@')[1] : '';
+  // Agregar como filtro de sender activo (aparece en el panel lateral)
+  const label = name || email;
+  const exists = S.emailSenderFilters.find(f=>f.email===email||f.email===('@'+domain));
+  if(!exists){
+    S.emailSenderFilters.push({email: email, label: label, active: true, blocked: true});
+    renderEmailFilters();
+  }
+  toast('✅ '+label+' bloqueado. Sus correos no aparecerán.');
+  closeM('m-email-view');
+  loadInbox();
+}
+
+// ── Contact Picker ────────────────────────────────
+let _cpTarget = null;
+async function openCPicker(targetId){
+  _cpTarget = targetId;
+  const res = document.getElementById('cp-res');
+  res.innerHTML = '<div style="color:var(--text-dim);font-size:12px;padding:8px">Cargando contactos...</div>';
+  document.getElementById('cp-q').value = '';
+  openM('m-cpicker');
+  if(!googleAccessToken){
+    res.innerHTML='<div style="color:var(--red);font-size:12px;padding:8px">⚠ Conecta tu cuenta Google primero</div>';
+    return;
+  }
+  try{
+    const r = await fetch('https://people.googleapis.com/v1/people/me/connections?personFields=names,emailAddresses&pageSize=100&sortOrder=FIRST_NAME_ASCENDING',
+      {headers:{Authorization:'Bearer '+googleAccessToken}});
+    const d = await r.json();
+    if(d.error) throw new Error(d.error.message);
+    const contacts = (d.connections||[])
+      .map(p=>({name:(p.names||[])[0]?.displayName||'', email:(p.emailAddresses||[])[0]?.value||''}))
+      .filter(c=>c.email);
+    renderCPickerList(contacts);
+  }catch(e){
+    res.innerHTML=`<div style="color:var(--red);font-size:12px;padding:8px">Error: ${escH(e.message)}</div>`;
+  }
+}
+
+function renderCPickerList(contacts){
+  const res = document.getElementById('cp-res');
+  if(!contacts.length){res.innerHTML='<div style="color:var(--text-dim);font-size:12px;padding:8px">Sin resultados</div>';return;}
+  res.innerHTML = contacts.map(c=>`
+    <div style="display:flex;align-items:center;gap:10px;padding:8px 10px;cursor:pointer;border-radius:4px;transition:background .12s"
+      onmouseover="this.style.background='var(--bg4)'" onmouseout="this.style.background=''"
+      onclick="pickContact('${escA(c.email)}')">
+      <div style="width:30px;height:30px;border-radius:50%;background:var(--teal);display:flex;align-items:center;justify-content:center;font-size:12px;font-weight:700;color:#000;flex-shrink:0">
+        ${(c.name||c.email)[0].toUpperCase()}
+      </div>
+      <div style="min-width:0;flex:1">
+        <div style="font-size:12px;font-weight:600;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">${escH(c.name||c.email)}</div>
+        <div style="font-size:11px;color:var(--text-dim);white-space:nowrap;overflow:hidden;text-overflow:ellipsis">${escH(c.email)}</div>
+      </div>
+    </div>`).join('');
+}
+
+async function pickSearch(){
+  const q = (document.getElementById('cp-q').value||'').trim();
+  if(!q){openCPicker(_cpTarget);return;}
+  const res = document.getElementById('cp-res');
+  res.innerHTML = thinking('Buscando...');
+  if(!googleAccessToken){res.innerHTML='<div style="color:var(--red);font-size:12px">⚠ Sin acceso Google</div>';return;}
+  try{
+    const r = await fetch(`https://people.googleapis.com/v1/people:searchContacts?query=${encodeURIComponent(q)}&readMask=names,emailAddresses&pageSize=20`,
+      {headers:{Authorization:'Bearer '+googleAccessToken}});
+    const d = await r.json();
+    const contacts = (d.results||[]).map(x=>x.person).map(p=>({
+      name:(p.names||[])[0]?.displayName||'',
+      email:(p.emailAddresses||[])[0]?.value||''
+    })).filter(c=>c.email);
+    renderCPickerList(contacts);
+  }catch(e){ res.innerHTML=`<div style="color:var(--red);font-size:12px">Error: ${escH(e.message)}</div>`; }
+}
+
+function pickContact(email){
+  if(!_cpTarget) return;
+  const inp = document.getElementById(_cpTarget);
+  if(!inp) return;
+  const cur = (inp.value||'').trim();
+  inp.value = cur ? cur.replace(/,\s*$/,'')+', '+email : email;
+  closeM('m-cpicker');
+  _cpTarget = null;
 }
 
 function getAttIcon(mime,name){
@@ -2127,48 +2338,66 @@ async function searchEmails(){
 async function loadAllContacts(){
   const area=document.getElementById('cont-area');
   const status=document.getElementById('cont-status');
-  area.innerHTML=thinking('Cargando contactos...');
+  area.innerHTML=thinking('Cargando contactos de Google...');
   setPill(['cont-pill','set-cont'],'syncing','Cargando...');
   if(!googleAccessToken){
-    area.innerHTML='<div class="empty-state"><div class="e-ico">🔑</div><p>Conecta tu cuenta Google primero</p></div>';
+    area.innerHTML='<div class="empty-state"><div class="e-ico">🔑</div><p>Conecta tu cuenta Google en Configuración</p></div>';
     setPill(['cont-pill','set-cont'],'err','Sin conexión');return;
   }
   try{
-    const res=await fetch('https://people.googleapis.com/v1/people/me/connections?personFields=names,emailAddresses,phoneNumbers,photos&pageSize=200&sortOrder=FIRST_NAME_ASCENDING',
-      {headers:{Authorization:'Bearer '+googleAccessToken}});
-    const d=await res.json();
-    if(d.error) throw new Error(d.error.message);
-    const contacts=(d.connections||[]).map(p=>({
-      name:(p.names||[])[0]?.displayName||'Sin nombre',
-      email:(p.emailAddresses||[])[0]?.value||'',
-      phone:(p.phoneNumbers||[])[0]?.value||'',
-      photo:(p.photos||[])[0]?.url||''
-    })).filter(c=>c.name!=='Sin nombre'||c.email);
+    // Cargar con paginación - hasta 1000 contactos
+    let allContacts=[], pageToken='', page=0;
+    do{
+      const url=`https://people.googleapis.com/v1/people/me/connections?personFields=names,emailAddresses,phoneNumbers,photos&pageSize=200&sortOrder=FIRST_NAME_ASCENDING${pageToken?'&pageToken='+pageToken:''}`;
+      const res=await fetch(url,{headers:{Authorization:'Bearer '+googleAccessToken}});
+      const d=await res.json();
+      if(d.error) throw new Error(d.error.message+' — Verifica que la API de Google People esté habilitada en tu proyecto Google Cloud');
+      (d.connections||[]).forEach(p=>allContacts.push({
+        name:(p.names||[])[0]?.displayName||'',
+        email:(p.emailAddresses||[])[0]?.value||'',
+        phone:(p.phoneNumbers||[])[0]?.value||'',
+        photo:(p.photos||[])[0]?.url||''
+      }));
+      pageToken=d.nextPageToken||'';
+      page++;
+    } while(pageToken && page<5);
+
+    const contacts=allContacts.filter(c=>c.name||c.email);
     setPill(['cont-pill','set-cont'],'ok',`Contacts — ${contacts.length}`);
     if(status) status.textContent=contacts.length+' contactos';
-    if(!contacts.length){area.innerHTML='<div class="empty-state"><div class="e-ico">👥</div><p>Sin contactos</p></div>';return;}
-    area.innerHTML=contacts.map(c=>{
-      const initials=(c.name||'?').split(' ').map(w=>w[0]).join('').toUpperCase().slice(0,2);
-      const colors=['#1a73e8','#0f9d58','#a142f4','#d93025','#e8710a','#1e88e5'];
-      const color=colors[(c.name||'').charCodeAt(0)%colors.length];
-      return `<div class="contact-card">
-        <div class="c-av" style="background:${c.photo?'transparent':color};color:#fff;overflow:hidden">
-          ${c.photo?`<img src="${c.photo}" style="width:100%;height:100%;object-fit:cover;border-radius:50%">`:`${initials}`}
-        </div>
-        <div class="c-info">
-          <div class="c-name">${escH(c.name)}</div>
-          ${c.email?`<div class="c-email">${escH(c.email)}</div>`:''}
-          ${c.phone?`<div class="c-phone">${escH(c.phone)}</div>`:''}
-        </div>
-        <div class="c-actions">
-          ${c.email?`<button class="btn btn-t" style="font-size:10px;padding:4px 9px" onclick="document.getElementById('em-to').value='${escA(c.email)}';switchMod('email');openCompose()">✉</button>`:''}
-        </div>
-      </div>`;
-    }).join('');
+    document.getElementById('cal-crumb') && null; // noop
+    if(!contacts.length){
+      area.innerHTML='<div class="empty-state"><div class="e-ico">👥</div><p>No se encontraron contactos.<br><small style="color:var(--text-dim)">Asegúrate de tener contactos en Google Contacts</small></p></div>';
+      return;
+    }
+    renderContactsList(contacts);
   }catch(e){
-    area.innerHTML=`<div class="empty-state"><div class="e-ico">⚠️</div><p>${e.message}</p></div>`;
+    area.innerHTML=`<div class="empty-state"><div class="e-ico">⚠️</div><p style="font-size:12px">${escH(e.message)}</p><button class="btn btn-t" style="margin-top:12px" onclick="loadAllContacts()">↺ Reintentar</button></div>`;
     setPill(['cont-pill','set-cont'],'err','Error');
+    console.error('Contacts error:',e);
   }
+}
+
+function renderContactsList(contacts){
+  const area=document.getElementById('cont-area');
+  area.innerHTML=`<div class="contact-grid">${contacts.map(c=>{
+    const initials=(c.name||c.email||'?').split(' ').map(w=>w[0]).join('').toUpperCase().slice(0,2)||'?';
+    const colors=['#1a73e8','#0f9d58','#a142f4','#d93025','#e8710a','#1e88e5','#00acc1'];
+    const color=colors[((c.name||c.email||'').charCodeAt(0)||0)%colors.length];
+    return `<div class="contact-card">
+      <div class="c-av" style="background:${c.photo?'transparent':color};color:#fff;overflow:hidden;flex-shrink:0">
+        ${c.photo?`<img src="${c.photo}" style="width:100%;height:100%;object-fit:cover;border-radius:50%">`:initials}
+      </div>
+      <div class="c-info" style="min-width:0;flex:1">
+        <div class="c-name">${escH(c.name||'Sin nombre')}</div>
+        ${c.email?`<div class="c-email">${escH(c.email)}</div>`:''}
+        ${c.phone?`<div class="c-phone">${escH(c.phone)}</div>`:''}
+      </div>
+      <div class="c-actions">
+        ${c.email?`<button class="btn btn-t" title="Enviar email" style="font-size:11px;padding:4px 9px" onclick="document.getElementById('em-to').value='${escA(c.email)}';switchMod('email');openCompose()">✉</button>`:''}
+      </div>
+    </div>`;
+  }).join('')}</div>`;
 }
 
 async function searchContacts(){
@@ -2812,9 +3041,11 @@ const GOOGLE_SCOPES = [
   'email','profile',
   'https://www.googleapis.com/auth/gmail.readonly',
   'https://www.googleapis.com/auth/gmail.send',
+  'https://www.googleapis.com/auth/gmail.modify',
   'https://www.googleapis.com/auth/calendar',
   'https://www.googleapis.com/auth/contacts.readonly',
   'https://www.googleapis.com/auth/contacts',
+  'https://www.googleapis.com/auth/directory.readonly',
   'https://www.googleapis.com/auth/drive.file'
 ].join(' ');
 
@@ -2901,11 +3132,16 @@ async function onGoogleToken(r){
   const gConn = document.getElementById('set-google-connected');
   if(gForm) gForm.style.display='none';
   if(gConn) gConn.style.display='block';
-  document.querySelectorAll('#gc-av').forEach(el=>el.textContent=S.googleEmail?S.googleEmail[0].toUpperCase():'G');
+  document.querySelectorAll('#gc-av').forEach(el=>{
+    const pic = S.currentUser?.avatar||'';
+    if(pic){ el.innerHTML=`<img src="${pic}" style="width:100%;height:100%;object-fit:cover;border-radius:50%">`; el.style.background='transparent'; el.style.overflow='hidden'; }
+    else { el.textContent=S.googleEmail?S.googleEmail[0].toUpperCase():'G'; }
+  });
   document.querySelectorAll('#gc-name').forEach(el=>el.textContent=S.googleName||'—');
   document.querySelectorAll('#gc-email').forEach(el=>el.textContent=S.googleEmail||'—');
   updateNavGoogleLabel(true);
   updateProfileUI();
+  updateGoogleSettingsUI();
   setSyncAll('ok');
   if(!window._silentRefresh) toast('✅ Google conectado: '+S.googleEmail);
   window._silentRefresh=false;
